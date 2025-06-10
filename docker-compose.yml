@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: .devcontainer/Dockerfile
     volumes:
-      - ./app:/code/app
+      - .:/code
       - ./requirements.txt:/code/requirements.txt
     ports:
       - "8000:8000"

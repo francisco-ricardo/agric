@@ -1,9 +1,10 @@
 {
   "name": "Django Dev Container",
   "build": {
-    "dockerfile": "Dockerfile"
+    "context": "..",
+    "dockerfile": "Dockerfile"    
   },
-  "workspaceFolder": "/code/app",
+  "workspaceFolder": "/code",
   "forwardPorts": [8000],
   "postCreateCommand": "pip install -r /code/requirements.txt",
   "customizations": {
