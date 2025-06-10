@@ -1,0 +1,36 @@
+services:
+
+  agric_db:
+    container_name: agric_db.dev
+    image: postgres:15
+    env_file:
+      - .env.postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agric_api:
+    container_name: agric_api.dev
+    image: agric_api.dev:latest
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ./app:/code/app
+      - ./requirements.txt:/code/requirements.txt
+    ports:
+      - "8000:8000"
+    depends_on:
+      agric_db:
+        condition: service_healthy
+    env_file:
+      - .env.django
+
+volumes:
+  postgres_data:
