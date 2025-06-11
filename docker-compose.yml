@@ -23,7 +23,6 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - .:/code
-      - ./requirements.txt:/code/requirements.txt
     ports:
       - "8000:8000"
     depends_on:

@@ -1,8 +1,8 @@
 FROM python:3.12-slim
 
-WORKDIR /code
+WORKDIR /workspaces/agric
 
-COPY requirements.txt /tmp
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sleep", "infinity"]

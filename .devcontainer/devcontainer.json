@@ -1,17 +1,15 @@
 {
-  "name": "Django Dev Container",
-  "build": {
-    "context": "..",
-    "dockerfile": "Dockerfile"    
-  },
-  "workspaceFolder": "/code",
+  "name": "agric_devcontainer",
+  "image": "agric_devcontainer:latest",
+  "workspaceFolder": "/workspaces/agric",
   "forwardPorts": [8000],
-  "postCreateCommand": "pip install -r /code/requirements.txt",
+  "postCreateCommand": "pip install -r /workspaces/agric/requirements.txt",
+  "runArgs": [
+    "--name", "agric_devcontainer",
+    "--network", "agric_default"
+  ],
   "customizations": {
     "vscode": {
-      "settings": {
-        "python.pythonPath": "/usr/local/bin/python"
-      },
       "extensions": [
         "ms-python.python",
         "ms-azuretools.vscode-docker"
