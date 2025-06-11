@@ -1,6 +1,20 @@
 
 
-.PHONY: up down run stop build updb help
+.PHONY: build updb createdb help
+
+
+build:
+	docker build -t agric_devcontainer:latest -f .devcontainer/Dockerfile .
+
+updb:
+	docker-compose up -d agric_db
+
+createdb:
+	docker exec -it agric_db.dev createdb -U agric agricdb
+
+help:
+	@egrep "^# Target:" [Mm]akefile
+
 
 
 # Target: up - Starts the FactoryDash development environment using Docker Compose.
@@ -44,20 +58,8 @@ stop:
 
 
 
-build:
-	docker build -t agric_devcontainer:latest -f .devcontainer/Dockerfile .
-
-updb:
-	docker-compose up -d agric_db
 
 
-# Target: help - Displays a list of available targets defined in this Makefile.
-# It parses the Makefile and extracts lines that start with
-# "# Target:" to provide a concise overview of available commands.
-#
-# Usage: make help
-help:
-	@egrep "^# Target:" [Mm]akefile
 
 
 # EOF

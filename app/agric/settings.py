@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -58,13 +59,16 @@ WSGI_APPLICATION = 'agric.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'agricdb',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',  # ou 'localhost' se rodar localmente sem Docker
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'agricdb'),
+        'USER': os.environ.get('POSTGRES_USER', 'agric'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'agric'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'agric_db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
+
+
+
 
 
 
