@@ -29,7 +29,7 @@ services:
       agric_db:
         condition: service_healthy
     env_file:
-      - .env.django
+      - .env
 
 volumes:
   postgres_data:

@@ -4,6 +4,17 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Carrega .env apenas em ambiente dev
+if os.environ.get("DJANGO_READ_DOTENV", "1") == "1":    
+    dotenv_path = os.path.join(BASE_DIR.parent, ".env")
+    print(f"Loading .env file from {dotenv_path}")
+    if os.path.exists(dotenv_path):
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path)
+
+# TODO: REMOVER
+print(f"Django DB Host: {os.environ.get('DJANGO_DB_HOST')}")
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$y=$%^l%zi08e(1sguhbvqh)rds=6bs&%f(&=m6dzmzj^#3%bd'
 

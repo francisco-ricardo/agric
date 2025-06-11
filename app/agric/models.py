@@ -15,6 +15,9 @@ class Produtor(models.Model):
     tipo_documento = models.CharField(max_length=10, choices=TIPO_DOCUMENTO_CHOICES)
     nome_produtor = models.CharField(max_length=255)
 
+    class Meta:
+        db_table = "produtor"    
+
     def clean(self):
         # Remove máscara
         self.cpf_cnpj = re.sub(r'\D', '', self.cpf_cnpj)
