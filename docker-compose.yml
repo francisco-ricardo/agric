@@ -3,8 +3,10 @@ services:
   agric_db:
     container_name: agric_db.dev
     image: postgres:15
-    env_file:
-      - .env.postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=agric
+      - POSTGRES_PASSWORD=agric
     ports:
       - "5432:5432"
     volumes:
