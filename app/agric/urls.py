@@ -20,9 +20,14 @@ from django.urls import path
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ProdutorViewSet
+from .views import EstadoViewSet
+from .views import CidadeViewSet
 
 router = DefaultRouter()
+
 router.register(r'produtores', ProdutorViewSet, basename='produtor')
+router.register(r'estados', EstadoViewSet, basename='estado')
+router.register(r'cidades', CidadeViewSet, basename='cidade')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

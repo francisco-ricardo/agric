@@ -10,6 +10,9 @@ Serializers do app Agric para a API REST.
 """
 from rest_framework import serializers
 from .models import Produtor
+from .models import Estado
+from .models import Cidade
+
 
 class ProdutorSerializer(serializers.ModelSerializer):
 
@@ -35,3 +38,29 @@ class ProdutorSerializer(serializers.ModelSerializer):
         if not (len(value) == 11 or len(value) == 14):
             raise serializers.ValidationError("CPF deve ter 11 dígitos ou CNPJ 14 dígitos.")
         return value
+    
+
+#
+
+
+class EstadoSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o model Estado.
+    """
+    class Meta:
+        model = Estado
+        fields = ['id_estado', 'nome_estado']
+
+
+#
+
+class CidadeSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o model Cidade.
+    """
+    class Meta:
+        model = Cidade
+        fields = ['id_cidade', 'nome_cidade', 'estado']
+
+
+    

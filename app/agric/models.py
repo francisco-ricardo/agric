@@ -39,3 +39,30 @@ class Produtor(models.Model):
     def __str__(self):
         return f"{self.nome_produtor} ({self.cpf_cnpj})"
 
+#
+
+class Estado(models.Model):
+    id_estado = models.BigAutoField(primary_key=True)
+    nome_estado = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        db_table = "estado"
+
+    def __str__(self):
+        return self.nome_estado
+    
+
+#
+
+
+class Cidade(models.Model):
+    id_cidade = models.BigAutoField(primary_key=True)
+    nome_cidade = models.CharField(max_length=255)
+    estado = models.ForeignKey('Estado', on_delete=models.CASCADE, related_name='cidades')
+
+    class Meta:
+        db_table = "cidade"
+        unique_together = ('nome_cidade', 'estado')
+
+    def __str__(self):
+        return f"{self.nome_cidade} ({self.estado.nome_estado})"
