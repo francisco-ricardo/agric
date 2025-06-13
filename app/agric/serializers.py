@@ -13,6 +13,8 @@ from .models import Produtor
 from .models import Estado
 from .models import Cidade
 from .models import TipoCultura
+from .models import Propriedade
+from .models import Cultura
 
 
 class ProdutorSerializer(serializers.ModelSerializer):
@@ -74,3 +76,41 @@ class TipoCulturaSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipoCultura
         fields = ['id_tipo_cultura', 'tipo_cultura']
+
+
+#
+
+
+class PropriedadeSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o model Propriedade.
+    """
+    class Meta:
+        model = Propriedade
+        fields = [
+            'id_propriedade', 'nome_propriedade', 'area_total',
+            'area_agricultavel', 'area_vegetacao', 'cidade', 'produtor'
+        ]
+
+    def validate(self, data):
+        area_total = data.get('area_total')
+        area_agricultavel = data.get('area_agricultavel')
+        area_vegetacao = data.get('area_vegetacao')
+        if area_total is not None and area_agricultavel is not None and area_vegetacao is not None:
+            if area_agricultavel + area_vegetacao > area_total:
+                raise serializers.ValidationError(
+                    "A soma das áreas agricultável e de vegetação não pode ultrapassar a área total."
+                )
+        return data
+    
+
+#
+
+
+class CulturaSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o model Cultura.
+    """
+    class Meta:
+        model = Cultura
+        fields = ['id_cultura', 'ano_safra', 'tipo_cultura', 'propriedade']

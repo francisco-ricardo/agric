@@ -23,6 +23,9 @@ from .views import ProdutorViewSet
 from .views import EstadoViewSet
 from .views import CidadeViewSet
 from .views import TipoCulturaViewSet
+from .views import PropriedadeViewSet
+from .views import CulturaViewSet
+from .views import DashboardView
 
 router = DefaultRouter()
 
@@ -30,8 +33,12 @@ router.register(r'produtores', ProdutorViewSet, basename='produtor')
 router.register(r'estados', EstadoViewSet, basename='estado')
 router.register(r'cidades', CidadeViewSet, basename='cidade')
 router.register(r'tipos-cultura', TipoCulturaViewSet, basename='tipocultura')
+router.register(r'propriedades', PropriedadeViewSet, basename='propriedade')
+router.register(r'culturas', CulturaViewSet, basename='cultura')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
 ]

@@ -1,15 +1,21 @@
 from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import Sum, Count
+
 from .models import Produtor
 from .serializers import ProdutorSerializer
-
 from .models import Estado
 from .serializers import EstadoSerializer
-
 from .models import Cidade
 from .serializers import CidadeSerializer
-
 from .models import TipoCultura
 from .serializers import TipoCulturaSerializer
+from .models import Cultura
+from .serializers import CulturaSerializer
+from .models import Propriedade
+from .serializers import PropriedadeSerializer
 
 
 class ProdutorViewSet(viewsets.ModelViewSet):
@@ -55,3 +61,72 @@ class TipoCulturaViewSet(viewsets.ModelViewSet):
     queryset = TipoCultura.objects.all()
     serializer_class = TipoCulturaSerializer
     lookup_field = 'id_tipo_cultura'
+
+
+#
+
+
+class PropriedadeViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para CRUD de Propriedade.
+    """
+    queryset = Propriedade.objects.all()
+    serializer_class = PropriedadeSerializer
+    lookup_field = 'id_propriedade'
+
+
+#
+
+
+class CulturaViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para CRUD de Cultura.
+    """
+    queryset = Cultura.objects.all()
+    serializer_class = CulturaSerializer
+    lookup_field = 'id_cultura'
+
+
+#
+
+
+class DashboardView(APIView):
+    """
+    Endpoint para estatísticas do dashboard.
+    """
+    def get(self, request):
+        # Total de fazendas cadastradas
+        total_fazendas = Propriedade.objects.count()
+        # Total de hectares registrados (área total)
+        total_hectares = Propriedade.objects.aggregate(total=Sum('area_total'))['total'] or 0
+
+        # Gráfico de pizza: por estado
+        fazendas_por_estado = (
+            Propriedade.objects
+            .values('cidade__estado__nome_estado')
+            .annotate(qtd=Count('id_propriedade'))
+            .order_by('-qtd')
+        )
+
+        # Gráfico de pizza: por cultura plantada
+        culturas = (
+            Cultura.objects
+            .values('tipo_cultura__tipo_cultura')
+            .annotate(qtd=Count('id_cultura'))
+            .order_by('-qtd')
+        )
+
+        # Gráfico de pizza: uso do solo
+        uso_solo = Propriedade.objects.aggregate(
+            total_agricultavel=Sum('area_agricultavel'),
+            total_vegetacao=Sum('area_vegetacao')
+        )
+
+        return Response({
+            "total_fazendas": total_fazendas,
+            "total_hectares": total_hectares,
+            "fazendas_por_estado": list(fazendas_por_estado),
+            "culturas_plantadas": list(culturas),
+            "uso_do_solo": uso_solo,
+        }, status=status.HTTP_200_OK)
+    
