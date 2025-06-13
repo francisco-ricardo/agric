@@ -66,3 +66,17 @@ class Cidade(models.Model):
 
     def __str__(self):
         return f"{self.nome_cidade} ({self.estado.nome_estado})"
+    
+
+#
+
+
+class TipoCultura(models.Model):
+    id_tipo_cultura = models.BigAutoField(primary_key=True)
+    tipo_cultura = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        db_table = "tipo_cultura"
+
+    def __str__(self):
+        return self.tipo_cultura

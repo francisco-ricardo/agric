@@ -22,12 +22,14 @@ from rest_framework.routers import DefaultRouter
 from .views import ProdutorViewSet
 from .views import EstadoViewSet
 from .views import CidadeViewSet
+from .views import TipoCulturaViewSet
 
 router = DefaultRouter()
 
 router.register(r'produtores', ProdutorViewSet, basename='produtor')
 router.register(r'estados', EstadoViewSet, basename='estado')
 router.register(r'cidades', CidadeViewSet, basename='cidade')
+router.register(r'tipos-cultura', TipoCulturaViewSet, basename='tipocultura')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

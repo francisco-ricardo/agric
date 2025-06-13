@@ -12,6 +12,7 @@ from rest_framework import serializers
 from .models import Produtor
 from .models import Estado
 from .models import Cidade
+from .models import TipoCultura
 
 
 class ProdutorSerializer(serializers.ModelSerializer):
@@ -63,4 +64,13 @@ class CidadeSerializer(serializers.ModelSerializer):
         fields = ['id_cidade', 'nome_cidade', 'estado']
 
 
-    
+#
+
+
+class TipoCulturaSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o model TipoCultura.
+    """
+    class Meta:
+        model = TipoCultura
+        fields = ['id_tipo_cultura', 'tipo_cultura']

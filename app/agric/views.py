@@ -8,6 +8,9 @@ from .serializers import EstadoSerializer
 from .models import Cidade
 from .serializers import CidadeSerializer
 
+from .models import TipoCultura
+from .serializers import TipoCulturaSerializer
+
 
 class ProdutorViewSet(viewsets.ModelViewSet):
     """
@@ -40,3 +43,15 @@ class CidadeViewSet(viewsets.ModelViewSet):
     queryset = Cidade.objects.all()
     serializer_class = CidadeSerializer
     lookup_field = 'id_cidade'
+
+
+#
+
+
+class TipoCulturaViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para CRUD de TipoCultura.
+    """
+    queryset = TipoCultura.objects.all()
+    serializer_class = TipoCulturaSerializer
+    lookup_field = 'id_tipo_cultura'
