@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Sum, Count
+from django.db.models import F, Sum, Count
 
 from .models import Produtor
 from .serializers import ProdutorSerializer
@@ -103,9 +103,12 @@ class DashboardView(APIView):
         # Gráfico de pizza: por estado
         fazendas_por_estado = (
             Propriedade.objects
-            .values('cidade__estado__nome_estado')
-            .annotate(qtd=Count('id_propriedade'))
-            .order_by('-qtd')
+                .values(nome_estado=F('cidade__estado__nome_estado'))
+                .annotate(
+                    qtd_fazendas=Count('id_propriedade'),
+                    total_hectares=Sum('area_total')
+                )
+                .order_by('-qtd_fazendas')
         )
 
         # Gráfico de pizza: por cultura plantada
