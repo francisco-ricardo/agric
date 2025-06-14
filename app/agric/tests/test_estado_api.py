@@ -19,3 +19,16 @@ class TestEstadoAPI:
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert any(e["nome_estado"] == "São Paulo" for e in response.data)
+
+    def test_update_estado(self):
+        resp = self.client.post(self.url, {"nome_estado": "Bahia"}, format='json')
+        estado_id = resp.data["id_estado"]
+        resp = self.client.patch(f"{self.url}{estado_id}/", {"nome_estado": "Bahia Atualizada"}, format='json')
+        assert resp.status_code == 200
+        assert resp.data["nome_estado"] == "Bahia Atualizada"
+
+    def test_delete_estado(self):
+        resp = self.client.post(self.url, {"nome_estado": "Paraná"}, format='json')
+        estado_id = resp.data["id_estado"]
+        resp = self.client.delete(f"{self.url}{estado_id}/")
+        assert resp.status_code == 204
