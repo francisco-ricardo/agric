@@ -114,10 +114,14 @@ class DashboardView(APIView):
         # Gráfico de pizza: por cultura plantada
         culturas = (
             Cultura.objects
-            .values(tipo_cultura=F('tipo_cultura__tipo_cultura'))
-            .annotate(qtd=Count('id_cultura'))
-            .order_by('-qtd')
-        )
+                .values(nome_tipo_cultura=F('tipo_cultura__tipo_cultura'))
+                .annotate(qtd=Count('id_cultura'))
+                .order_by('-qtd')
+        )   
+        culturas_list = []
+        for item in culturas:
+            item['tipo_cultura'] = item.pop('nome_tipo_cultura')
+            culturas_list.append(item)
 
         # Gráfico de pizza: uso do solo
         uso_solo = Propriedade.objects.aggregate(
@@ -129,7 +133,7 @@ class DashboardView(APIView):
             "total_fazendas": total_fazendas,
             "total_hectares": total_hectares,
             "fazendas_por_estado": list(fazendas_por_estado),
-            "culturas_plantadas": list(culturas),
+            "culturas_plantadas": culturas_list,
             "uso_do_solo": uso_solo,
         }, status=status.HTTP_200_OK)
     
