@@ -114,7 +114,7 @@ class DashboardView(APIView):
         # Gráfico de pizza: por cultura plantada
         culturas = (
             Cultura.objects
-            .values('tipo_cultura__tipo_cultura')
+            .values(tipo_cultura=F('tipo_cultura__tipo_cultura'))
             .annotate(qtd=Count('id_cultura'))
             .order_by('-qtd')
         )

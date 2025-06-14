@@ -1,4 +1,23 @@
 #!/usr/bin/env python3
+"""
+Script de seed para popular a base de dados da API agric.
+
+Este script utiliza a API REST para criar:
+- Estados e cidades brasileiras válidas
+- Tipos de cultura agrícolas reais
+- Produtores rurais com dados fictícios
+- Propriedades com áreas variadas e consistentes
+- Culturas variadas por propriedade e safra, respeitando regras de unicidade e área
+
+Características:
+- Gera dados variados usando listas fixas e Faker
+- Garante unicidade e integridade referencial conforme regras de negócio
+- Pode ser executado múltiplas vezes após limpar a base
+
+Uso:
+    python scripts/seed_api.py
+
+"""
 
 import requests
 import random
@@ -7,6 +26,12 @@ from faker import Faker
 
 
 def post(endpoint, data) -> dict:
+    """
+    Envia uma requisição POST para a API para criar um novo recurso.
+        :param endpoint: O endpoint da API onde o recurso será criado.
+        :param data: Os dados a serem enviados no corpo da requisição.
+        :return: O JSON retornado pela API ou None em caso de erro.
+    """
     API_URL = "http://localhost:8000/api"
     r = requests.post(f"{API_URL}/{endpoint}/", json=data)
     if r.status_code not in (200, 201):
@@ -19,11 +44,11 @@ if __name__ == "__main__":
     fake = Faker('pt_BR')
 
     # Estados
-    estados_brasileiros = [
+    estados_brasileiros = (
         "Bahia", "Ceará", "Goiás", "Mato Grosso", "Minas Gerais", 
         "Paraná", "Rio Grande do Sul", "Santa Catarina",
-        "São Paulo", "Tocantins"
-    ]
+        "São Paulo", "Tocantins",
+    )
     estados = []
     for i in range(10):
         nome_estado = estados_brasileiros[i]
@@ -32,10 +57,10 @@ if __name__ == "__main__":
             estados.append(estado)
 
     # Cidades
-    cidades_brasil = [
+    cidades_brasil = (
         "Salvador", "Fortaleza", "Goiânia", "Cuiabá", "Belo Horizonte",
-        "Curitiba", "Porto Alegre", "Chapecó", "São Paulo", "Palmas"
-    ]
+        "Guarapuava", "Porto Alegre", "Chapecó", "Ribeirão Preto", "Palmas",
+    )
     cidades = []
     for i in range(10):
         nome_cidade = cidades_brasil[i]
@@ -43,9 +68,10 @@ if __name__ == "__main__":
         cidades.append(post("cidades", {"nome_cidade": nome_cidade, "estado": estado_id}))
 
     # Tipos de Cultura
+    tipos_cultura_validos = ("Soja", "Milho", "Café", "Arroz", "Trigo",)
     tipos_cultura = []
-    for _ in range(5):
-        nome = fake.unique.word().capitalize()
+    for i in range(5):
+        nome = tipos_cultura_validos[i]
         tipo_cultura = post("tipos-cultura", {"tipo_cultura": nome})
         if tipo_cultura:
             tipos_cultura.append(tipo_cultura)
@@ -83,49 +109,31 @@ if __name__ == "__main__":
             if prop:
                 propriedades.append(prop)
 
-    # Culturas (5 exemplos)
-    for i in range(5):
-        nome = fake.unique.word().capitalize()
-        area_cultura = round(random.uniform(5, propriedades[i]["area_agricultavel"]), 2)
-        ano_safra = datetime.now().year
-        cultura = post("culturas", {
-            "nome_cultura": nome,
-            "propriedade": propriedades[i]["id_propriedade"],
-            "tipo_cultura": tipos_cultura[i]["id_tipo_cultura"],
-            "area": area_cultura,
-            "ano_safra": ano_safra
-        })
+    # Culturas
+    anos_safra = (datetime.now().year - 1, datetime.now().year,)
 
-
-
-
-
-    # propriedades = []
-    # for idx, produtor in enumerate(produtores):
-    #     for j in range(1, (idx % 3) + 2):
-    #         nome = fake.unique.company()
-    #         cidade_id = cidades[idx % 10]["id_cidade"]
-    #         prop = post("propriedades", {
-    #             "nome_propriedade": nome,
-    #             "produtor": produtor["cpf_cnpj"],
-    #             "cidade": cidade_id,
-    #             "area_total": 100.0,
-    #             "area_agricultavel": 60.0,
-    #             "area_vegetacao": 40.0
-    #         })
-    #         if prop:
-    #             propriedades.append(prop)
-
-    # # Culturas
-    # for i in range(5):
-    #     nome = fake.unique.word().capitalize()
-    #     ano_safra = datetime.now().year  # ou outro valor desejado
-    #     cultura = post("culturas", {
-    #         "nome_cultura": nome,
-    #         "propriedade": propriedades[i]["id_propriedade"],
-    #         "tipo_cultura": tipos_cultura[i]["id_tipo_cultura"],
-    #         "area": 20.0,
-    #         "ano_safra": ano_safra
-    # })
+    for prop in propriedades:
+        num_culturas = random.randint(1, 4)  # de 1 a 4 culturas por propriedade
+        combinacoes = []
+        for ano in anos_safra:
+            for tipo in tipos_cultura:
+                combinacoes.append((ano, tipo))
+        random.shuffle(combinacoes)
+        area_disponivel = prop["area_agricultavel"]
+        for i in range(num_culturas):
+            if not combinacoes or area_disponivel < 5:
+                break
+            ano_safra, tipo_cultura = combinacoes.pop()
+            # Sorteia uma área entre 5 e o máximo possível restante
+            max_area = min(area_disponivel, 50)
+            area_cultura = round(random.uniform(5, max_area), 2)
+            area_disponivel -= area_cultura
+            post("culturas", {
+                "nome_cultura": tipo_cultura["tipo_cultura"],
+                "propriedade": prop["id_propriedade"],
+                "tipo_cultura": tipo_cultura["id_tipo_cultura"],
+                "area": area_cultura,
+                "ano_safra": ano_safra
+            })
 
     print("Seed via API concluido!")
