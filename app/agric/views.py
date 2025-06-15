@@ -45,6 +45,11 @@ from .serializers import CulturaSerializer
 from .models import Propriedade
 from .serializers import PropriedadeSerializer
 
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import OpenApiParameter
+from drf_spectacular.utils import OpenApiExample
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -86,6 +91,20 @@ class LoggingModelViewSet(viewsets.ModelViewSet):
             logger.error("Erro ao atualizar em %s por %s: %s | Tempo: %.3fs", self.__class__.__name__, user, str(e), elapsed, exc_info=True)
             raise
 
+
+    def partial_update(self, request, *args, **kwargs):
+        user = getattr(request, "user", None)
+        start = time.monotonic()
+        try:
+            response = super().partial_update(request, *args, **kwargs)
+            logger.info("Usuário %s fez PATCH em %s | Tempo: %.3fs", user, self.__class__.__name__, time.monotonic() - start)
+            return response
+        except Exception as e:
+            elapsed = time.monotonic() - start
+            logger.error("Erro ao fazer PATCH em %s por %s: %s | Tempo: %.3fs", self.__class__.__name__, user, str(e), elapsed, exc_info=True)
+            raise
+
+
     def destroy(self, request, *args, **kwargs):
         user = getattr(request, "user", None)
         start = time.monotonic()
@@ -99,24 +118,149 @@ class LoggingModelViewSet(viewsets.ModelViewSet):
             raise
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar produtores",
+        description="Retorna uma lista paginada de produtores rurais cadastrados no sistema.",
+        responses={200: ProdutorSerializer(many=True)},
+        examples=[
+            OpenApiExample(
+                'Exemplo de resposta',
+                value=[
+                    {"cpf_cnpj": "12345678901", "tipo_documento": "CPF", "nome_produtor": "João Silva"},
+                    {"cpf_cnpj": "12345678000199", "tipo_documento": "CNPJ", "nome_produtor": "Fazenda Boa Terra"}
+                ],
+                response_only=True
+            )
+        ]
+    ),
+    create=extend_schema(
+        summary="Criar produtor",
+        description="Cria um novo produtor rural. O campo `cpf_cnpj` deve ser único e válido (CPF ou CNPJ).",
+        request=ProdutorSerializer,
+        responses={201: ProdutorSerializer},
+        examples=[
+            OpenApiExample(
+                'Exemplo de requisição',
+                value={"cpf_cnpj": "12345678901", "nome_produtor": "João Silva"},
+                request_only=True
+            )
+        ]
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar produtor",
+        description="Retorna os dados de um produtor rural identificado por CPF ou CNPJ.",
+        responses={200: ProdutorSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar produtor",
+        description="Atualiza os dados de um produtor rural existente.",
+        request=ProdutorSerializer,
+        responses={200: ProdutorSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de produtor",
+        description="Atualiza parcialmente os dados de um produtor rural. Apenas os campos enviados serão alterados.",
+        request=ProdutorSerializer,
+        responses={200: ProdutorSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar produtor",
+        description="Remove um produtor rural do sistema.",
+        responses={204: None}
+    ),
+)
 class ProdutorViewSet(LoggingModelViewSet):
     """
-    ViewSet para operações CRUD de Produtor.
+    Endpoints para gestão de produtores rurais.
+
+    Permite listar, criar, consultar, atualizar e deletar produtores.
+    O campo `cpf_cnpj` pode ser CPF ou CNPJ, e é usado como identificador único.
     """
     queryset = Produtor.objects.all()
     serializer_class = ProdutorSerializer
     lookup_field = 'cpf_cnpj'
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar estados",
+        description="Retorna todos os estados cadastrados.",
+        responses={200: EstadoSerializer(many=True)}
+    ),
+    create=extend_schema(
+        summary="Criar estado",
+        description="Cria um novo estado.",
+        request=EstadoSerializer,
+        responses={201: EstadoSerializer}
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar estado",
+        description="Retorna os dados de um estado pelo seu ID.",
+        responses={200: EstadoSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar estado",
+        description="Atualiza os dados de um estado existente.",
+        request=EstadoSerializer,
+        responses={200: EstadoSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de estado",
+        description="Atualiza parcialmente os dados de um estado. Apenas os campos enviados serão alterados.",
+        request=EstadoSerializer,
+        responses={200: EstadoSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar estado",
+        description="Remove um estado do sistema.",
+        responses={204: None}
+    ),
+)
 class EstadoViewSet(LoggingModelViewSet):
     """
-    ViewSet para operações CRUD de Estado.
+    Endpoints para gestão de estados.
     """
     queryset = Estado.objects.all()
     serializer_class = EstadoSerializer
     lookup_field = 'id_estado'
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar cidades",
+        description="Retorna todas as cidades cadastradas.",
+        responses={200: CidadeSerializer(many=True)}
+    ),
+    create=extend_schema(
+        summary="Criar cidade",
+        description="Cria uma nova cidade vinculada a um estado.",
+        request=CidadeSerializer,
+        responses={201: CidadeSerializer}
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar cidade",
+        description="Retorna os dados de uma cidade pelo seu ID.",
+        responses={200: CidadeSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar cidade",
+        description="Atualiza os dados de uma cidade existente.",
+        request=CidadeSerializer,
+        responses={200: CidadeSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de cidade",
+        description="Atualiza parcialmente os dados de uma cidade. Apenas os campos enviados serão alterados.",
+        request=CidadeSerializer,
+        responses={200: CidadeSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar cidade",
+        description="Remove uma cidade do sistema.",
+        responses={204: None}
+    ),
+)
 class CidadeViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Cidade.
@@ -126,6 +270,41 @@ class CidadeViewSet(LoggingModelViewSet):
     lookup_field = 'id_cidade'
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar tipos de cultura",
+        description="Retorna todos os tipos de cultura agrícola cadastrados.",
+        responses={200: TipoCulturaSerializer(many=True)}
+    ),
+    create=extend_schema(
+        summary="Criar tipo de cultura",
+        description="Cria um novo tipo de cultura agrícola.",
+        request=TipoCulturaSerializer,
+        responses={201: TipoCulturaSerializer}
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar tipo de cultura",
+        description="Retorna os dados de um tipo de cultura pelo seu ID.",
+        responses={200: TipoCulturaSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar tipo de cultura",
+        description="Atualiza os dados de um tipo de cultura existente.",
+        request=TipoCulturaSerializer,
+        responses={200: TipoCulturaSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de tipo de cultura",
+        description="Atualiza parcialmente os dados de um tipo de cultura. Apenas os campos enviados serão alterados.",
+        request=TipoCulturaSerializer,
+        responses={200: TipoCulturaSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar tipo de cultura",
+        description="Remove um tipo de cultura do sistema.",
+        responses={204: None}
+    ),
+)
 class TipoCulturaViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de TipoCultura.
@@ -135,6 +314,41 @@ class TipoCulturaViewSet(LoggingModelViewSet):
     lookup_field = 'id_tipo_cultura'
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar propriedades",
+        description="Retorna todas as propriedades rurais cadastradas.",
+        responses={200: PropriedadeSerializer(many=True)}
+    ),
+    create=extend_schema(
+        summary="Criar propriedade",
+        description="Cria uma nova propriedade rural vinculada a um produtor e cidade.",
+        request=PropriedadeSerializer,
+        responses={201: PropriedadeSerializer}
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar propriedade",
+        description="Retorna os dados de uma propriedade pelo seu ID.",
+        responses={200: PropriedadeSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar propriedade",
+        description="Atualiza os dados de uma propriedade existente.",
+        request=PropriedadeSerializer,
+        responses={200: PropriedadeSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de propriedade",
+        description="Atualiza parcialmente os dados de uma propriedade. Apenas os campos enviados serão alterados.",
+        request=PropriedadeSerializer,
+        responses={200: PropriedadeSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar propriedade",
+        description="Remove uma propriedade do sistema.",
+        responses={204: None}
+    ),
+)
 class PropriedadeViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Propriedade.
@@ -142,8 +356,43 @@ class PropriedadeViewSet(LoggingModelViewSet):
     queryset = Propriedade.objects.all()
     serializer_class = PropriedadeSerializer
     lookup_field = 'id_propriedade'
-    
 
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar culturas",
+        description="Retorna todas as culturas agrícolas cadastradas.",
+        responses={200: CulturaSerializer(many=True)}
+    ),
+    create=extend_schema(
+        summary="Criar cultura",
+        description="Cria uma nova cultura agrícola vinculada a uma propriedade e tipo de cultura.",
+        request=CulturaSerializer,
+        responses={201: CulturaSerializer}
+    ),
+    retrieve=extend_schema(
+        summary="Detalhar cultura",
+        description="Retorna os dados de uma cultura pelo seu ID.",
+        responses={200: CulturaSerializer}
+    ),
+    update=extend_schema(
+        summary="Atualizar cultura",
+        description="Atualiza os dados de uma cultura existente.",
+        request=CulturaSerializer,
+        responses={200: CulturaSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Atualização parcial de cultura",
+        description="Atualiza parcialmente os dados de uma cultura. Apenas os campos enviados serão alterados.",
+        request=CulturaSerializer,
+        responses={200: CulturaSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Deletar cultura",
+        description="Remove uma cultura do sistema.",
+        responses={204: None}
+    ),
+)
 class CulturaViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Cultura.
@@ -153,6 +402,33 @@ class CulturaViewSet(LoggingModelViewSet):
     lookup_field = 'id_cultura'
 
 
+@extend_schema(
+    summary="Dashboard consolidado",
+    description=(
+        "Retorna estatísticas agregadas do sistema, incluindo total de fazendas, hectares, "
+        "culturas plantadas, distribuição de fazendas por estado e uso do solo."
+    ),
+    responses={
+        200: OpenApiExample(
+            'Exemplo de resposta',
+            value={
+                "total_fazendas": 10,
+                "total_hectares": 1500,
+                "fazendas_por_estado": [
+                    {"nome_estado": "SP", "qtd_fazendas": 5, "total_hectares": 800}
+                ],
+                "culturas_plantadas": [
+                    {"tipo_cultura": "Grãos", "qtd": 7}
+                ],
+                "uso_do_solo": {
+                    "total_agricultavel": 1200,
+                    "total_vegetacao": 300
+                }
+            },
+            response_only=True
+        )
+    }
+)
 class DashboardView(APIView):
     """
     Endpoint somente leitura para estatísticas consolidadas do sistema.
