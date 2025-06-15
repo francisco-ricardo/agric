@@ -1,16 +1,14 @@
 """
-Comando Django para popular o banco de dados com dados realistas para testes e desenvolvimento.
+seed.py
 
-- Cria estados e cidades brasileiras válidas (listas fixas)
-- Cria tipos de cultura agrícolas reais (lista fixa)
-- Gera produtores com dados fictícios únicos
-- Gera propriedades com áreas variadas e consistentes
-- Gera culturas variadas por propriedade e safra, respeitando unicidade
+Comando customizado do Django para popular o banco de dados do app Agric com dados de exemplo.
+
+Este comando cria registros fictícios para produtores, propriedades, culturas, cidades, 
+estados e tipos de cultura, facilitando o desenvolvimento, testes e demonstrações do sistema.
 
 Uso:
     python manage.py seed
 """
-
 from django.core.management.base import BaseCommand
 from agric.models import Estado, Cidade, TipoCultura, Produtor, Propriedade, Cultura
 from agric.validators import get_document_type
@@ -18,10 +16,24 @@ from faker import Faker
 import random
 from datetime import datetime
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class Command(BaseCommand):
+    """
+    Comando Django para inserir dados de exemplo nas tabelas principais do app Agric.
+
+    Cria registros de: Estado, Cidade, TipoCultura, Produtor, Propriedade e Cultura.
+    Útil para inicializar o sistema com dados mínimos para testes e desenvolvimento.
+    """
+
     help = "Popula o banco de dados com dados realistas para testes e desenvolvimento."
 
     def handle(self, *args, **kwargs):
+
+        logger.info("Iniciando comando seed para popular o banco de dados com dados de exemplo.")
+
         fake = Faker('pt_BR')
         Faker.seed(0)
         random.seed(0)
@@ -45,6 +57,8 @@ class Command(BaseCommand):
             for nome_cidade in est["cidades"]:
                 cidade, _ = Cidade.objects.get_or_create(nome_cidade=nome_cidade, estado=estado)
                 cidades.append(cidade)
+        logger.info(f"{len(cidades)} cidades criadas com sucesso!")
+        logger.info(f"{len(estados_brasil)} estados criados com sucesso!")
 
         # Tipos de cultura
         tipos_cultura_nomes = [
@@ -52,6 +66,7 @@ class Command(BaseCommand):
             "Arroz", "Feijão", "Trigo", "Laranja", "Banana"
         ]
         tipos_cultura = [TipoCultura.objects.get_or_create(tipo_cultura=nome)[0] for nome in tipos_cultura_nomes]
+        logger.info(f"{len(tipos_cultura)} tipos de cultura criados com sucesso!")
 
         # Produtores
         produtores = []
@@ -73,6 +88,9 @@ class Command(BaseCommand):
                         break
                 except Exception:
                     continue
+        logger.info(f"{len(produtores)} produtores criados com sucesso!")
+        if not produtores:
+            logger.warning("Nenhum produtor foi criado. Verifique os dados gerados.")
 
         # Propriedades
         propriedades = []
@@ -94,6 +112,7 @@ class Command(BaseCommand):
                     }
                 )
                 propriedades.append(prop)
+        logger.info(f"{len(propriedades)} propriedades criadas com sucesso!")
 
         # Culturas
         anos_safra = [datetime.now().year - 1, datetime.now().year]
@@ -110,6 +129,7 @@ class Command(BaseCommand):
                     tipo_cultura=tipo_cultura,
                     ano_safra=ano_safra
                 )
+        logger.info(f"{len(Cultura.objects.all())} culturas criadas com sucesso!")
 
-        self.stdout.write(self.style.SUCCESS("Seed via ORM concluído!"))
+        logger.info("Seed via ORM concluído com sucesso!")
         

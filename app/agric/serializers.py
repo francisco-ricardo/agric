@@ -3,10 +3,16 @@ serializers.py
 
 Serializers do app Agric para a API REST.
 
-- ProdutorSerializer: Responsável por serializar e validar os dados do model Produtor.
-    - Garante que o campo cpf_cnpj seja um CPF ou CNPJ válido (apenas números, 11 ou 14 dígitos).
-    - O campo tipo_documento é preenchido automaticamente pelo model e é somente leitura na API.
-    - Utiliza ModelSerializer para reaproveitar validações e facilitar manutenção.
+Este módulo define os serializers responsáveis por validar, serializar e desserializar
+os dados das principais entidades do sistema agric:
+- Produtor
+- Estado
+- Cidade
+- TipoCultura
+- Propriedade
+- Cultura
+
+Cada serializer garante as regras de negócio e integridade dos dados para a API.
 """
 from rest_framework import serializers
 from .models import Produtor
@@ -18,7 +24,12 @@ from .models import Cultura
 
 
 class ProdutorSerializer(serializers.ModelSerializer):
-
+    """
+    Serializador para o model Produtor.
+    - Valida CPF/CNPJ.
+    - Preenche automaticamente o tipo de documento.
+    - Usa o campo cpf_cnpj como identificador.
+    """
     class Meta:
         model = Produtor
         fields = ['cpf_cnpj', 'tipo_documento', 'nome_produtor']
@@ -26,6 +37,11 @@ class ProdutorSerializer(serializers.ModelSerializer):
 
     
     def create(self, validated_data):
+        """
+        Cria um novo Produtor.
+        Define automaticamente o tipo de documento (CPF ou CNPJ) com base no tamanho 
+        do campo cpf_cnpj.
+        """
         cpf_cnpj = validated_data.get("cpf_cnpj", "")
         if len(cpf_cnpj) == 11:
             validated_data["tipo_documento"] = "CPF"
@@ -37,14 +53,15 @@ class ProdutorSerializer(serializers.ModelSerializer):
 
 
     def validate_cpf_cnpj(self, value):
+        """
+        Valida o campo cpf_cnpj, garantindo que contenha apenas números e 
+        tenha 11 (CPF) ou 14 (CNPJ) dígitos.
+        """
         value = ''.join(filter(str.isdigit, value))
         if not (len(value) == 11 or len(value) == 14):
             raise serializers.ValidationError("CPF deve ter 11 dígitos ou CNPJ 14 dígitos.")
         return value
     
-
-#
-
 
 class EstadoSerializer(serializers.ModelSerializer):
     """
@@ -55,35 +72,31 @@ class EstadoSerializer(serializers.ModelSerializer):
         fields = ['id_estado', 'nome_estado']
 
 
-#
-
 class CidadeSerializer(serializers.ModelSerializer):
     """
     Serializador para o model Cidade.
+    - Serializa id, nome e estado associado.
     """
     class Meta:
         model = Cidade
         fields = ['id_cidade', 'nome_cidade', 'estado']
 
 
-#
-
-
 class TipoCulturaSerializer(serializers.ModelSerializer):
     """
     Serializador para o model TipoCultura.
+    - Serializa id e nome do tipo de cultura.
     """
     class Meta:
         model = TipoCultura
         fields = ['id_tipo_cultura', 'tipo_cultura']
 
 
-#
-
-
 class PropriedadeSerializer(serializers.ModelSerializer):
     """
     Serializador para o model Propriedade.
+    - Valida soma das áreas agricultável e de vegetação.
+    - Serializa todos os campos principais da propriedade.
     """
     class Meta:
         model = Propriedade
@@ -93,6 +106,10 @@ class PropriedadeSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
+        """
+        Valida se a soma das áreas agricultável e de vegetação não ultrapassa a 
+        área total da propriedade.
+        """
         area_total = data.get('area_total')
         area_agricultavel = data.get('area_agricultavel')
         area_vegetacao = data.get('area_vegetacao')
@@ -102,14 +119,13 @@ class PropriedadeSerializer(serializers.ModelSerializer):
                     "A soma das áreas agricultável e de vegetação não pode ultrapassar a área total."
                 )
         return data
-    
-
-#
 
 
 class CulturaSerializer(serializers.ModelSerializer):
     """
     Serializador para o model Cultura.
+    - Serializa id, ano_safra, tipo_cultura e propriedade.
+    - Garante unicidade por (ano_safra, tipo_cultura, propriedade).
     """
     class Meta:
         model = Cultura

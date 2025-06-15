@@ -1,3 +1,31 @@
+"""
+views.py
+
+Este módulo define as views da API REST para o app Agric, utilizando Django REST Framework.
+
+Inclui ViewSets para os principais recursos do domínio agrícola:
+- Produtor
+- Estado
+- Cidade
+- TipoCultura
+- Propriedade
+- Cultura
+
+Cada ViewSet provê operações CRUD completas, com suporte a filtros por identificadores 
+customizados (ex: cpf_cnpj, id_estado, etc).
+Também expõe um endpoint customizado para o dashboard consolidado, que retorna estatísticas 
+agregadas sobre fazendas, culturas e uso do solo.
+
+Classes:
+- ProdutorViewSet: CRUD de produtores rurais.
+- EstadoViewSet: CRUD de estados.
+- CidadeViewSet: CRUD de cidades.
+- TipoCulturaViewSet: CRUD de tipos de cultura.
+- PropriedadeViewSet: CRUD de propriedades rurais.
+- CulturaViewSet: CRUD de culturas agrícolas.
+- DashboardView: Endpoint GET para estatísticas consolidadas.
+"""
+
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -20,79 +48,83 @@ from .serializers import PropriedadeSerializer
 
 class ProdutorViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de Produtor.
+    ViewSet para operações CRUD de Produtor.
+
     Permite listar, criar, atualizar e deletar produtores rurais.
+    Utiliza o campo 'cpf_cnpj' como identificador principal nas rotas.
     """
     queryset = Produtor.objects.all()
     serializer_class = ProdutorSerializer
     lookup_field = 'cpf_cnpj'
 
 
-#
-
-
 class EstadoViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de Estado.
+    ViewSet para operações CRUD de Estado.
+
+    Permite listar, criar, atualizar e deletar estados.
+    Utiliza o campo 'id_estado' como identificador principal nas rotas.
     """
     queryset = Estado.objects.all()
     serializer_class = EstadoSerializer
     lookup_field = 'id_estado'
 
 
-#
-
 class CidadeViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de Cidade.
+    ViewSet para operações CRUD de Cidade.
+
+    Permite listar, criar, atualizar e deletar cidades.
+    Utiliza o campo 'id_cidade' como identificador principal nas rotas.
     """
     queryset = Cidade.objects.all()
     serializer_class = CidadeSerializer
     lookup_field = 'id_cidade'
 
 
-#
-
-
 class TipoCulturaViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de TipoCultura.
+    ViewSet para operações CRUD de TipoCultura.
+
+    Permite listar, criar, atualizar e deletar tipos de cultura agrícola.
+    Utiliza o campo 'id_tipo_cultura' como identificador principal nas rotas.
     """
     queryset = TipoCultura.objects.all()
     serializer_class = TipoCulturaSerializer
     lookup_field = 'id_tipo_cultura'
 
 
-#
-
-
 class PropriedadeViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de Propriedade.
+    ViewSet para operações CRUD de Propriedade.
+
+    Permite listar, criar, atualizar e deletar propriedades rurais.
+    Utiliza o campo 'id_propriedade' como identificador principal nas rotas.
     """
     queryset = Propriedade.objects.all()
     serializer_class = PropriedadeSerializer
     lookup_field = 'id_propriedade'
 
 
-#
-
-
 class CulturaViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para CRUD de Cultura.
+    ViewSet para operações CRUD de Cultura.
+
+    Permite listar, criar, atualizar e deletar culturas agrícolas.
+    Utiliza o campo 'id_cultura' como identificador principal nas rotas.
     """
     queryset = Cultura.objects.all()
     serializer_class = CulturaSerializer
     lookup_field = 'id_cultura'
 
 
-#
-
-
 class DashboardView(APIView):
     """
-    Endpoint para estatísticas do dashboard.
+    Endpoint somente leitura para estatísticas consolidadas do sistema.
+
+    Retorna dados agregados sobre fazendas, hectares, culturas plantadas,
+    distribuição por estado e uso do solo.
+    Disponível apenas via método GET.
     """
     def get(self, request):
         # Total de fazendas cadastradas
@@ -136,4 +168,3 @@ class DashboardView(APIView):
             "culturas_plantadas": culturas_list,
             "uso_do_solo": uso_solo,
         }, status=status.HTTP_200_OK)
-    

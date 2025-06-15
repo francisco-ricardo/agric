@@ -18,31 +18,20 @@ Uso:
     python scripts/seed_api.py
 
 """
-
 import requests
 import random
 from datetime import datetime
 from faker import Faker
 
 
-def post(endpoint, data) -> dict:
+def main():
     """
-    Envia uma requisição POST para a API para criar um novo recurso.
-        :param endpoint: O endpoint da API onde o recurso será criado.
-        :param data: Os dados a serem enviados no corpo da requisição.
-        :return: O JSON retornado pela API ou None em caso de erro.
+    Função principal que executa o processo de seed.
     """
-    API_URL = "http://localhost:8000/api"
-    r = requests.post(f"{API_URL}/{endpoint}/", json=data)
-    if r.status_code not in (200, 201):
-        print(f"Erro ao criar em {endpoint}: {r.status_code} - {r.text}")
-    return r.json() if r.ok else None
 
-
-if __name__ == "__main__":
-    
     fake = Faker('pt_BR')
 
+    
     # Estados
     estados_brasileiros = (
         "Bahia", "Ceará", "Goiás", "Mato Grosso", "Minas Gerais", 
@@ -56,6 +45,7 @@ if __name__ == "__main__":
         if estado:
             estados.append(estado)
 
+    
     # Cidades
     cidades_brasil = (
         "Salvador", "Fortaleza", "Goiânia", "Cuiabá", "Belo Horizonte",
@@ -67,6 +57,7 @@ if __name__ == "__main__":
         estado_id = estados[i]["id_estado"]
         cidades.append(post("cidades", {"nome_cidade": nome_cidade, "estado": estado_id}))
 
+    
     # Tipos de Cultura
     tipos_cultura_validos = ("Soja", "Milho", "Café", "Arroz", "Trigo",)
     tipos_cultura = []
@@ -76,6 +67,7 @@ if __name__ == "__main__":
         if tipo_cultura:
             tipos_cultura.append(tipo_cultura)
 
+    
     # Produtores
     produtores = []
     for i in range(10):
@@ -109,6 +101,7 @@ if __name__ == "__main__":
             if prop:
                 propriedades.append(prop)
 
+    
     # Culturas
     anos_safra = (datetime.now().year - 1, datetime.now().year,)
 
@@ -137,3 +130,23 @@ if __name__ == "__main__":
             })
 
     print("Seed via API concluido!")
+
+
+def post(endpoint, data) -> dict:
+    """
+    Envia uma requisição POST para a API para criar um novo recurso.
+        :param endpoint: O endpoint da API onde o recurso será criado.
+        :param data: Os dados a serem enviados no corpo da requisição.
+        :return: O JSON retornado pela API ou None em caso de erro.
+    """
+    API_URL = "http://localhost:8000/api"
+    r = requests.post(f"{API_URL}/{endpoint}/", json=data)
+    if r.status_code not in (200, 201):
+        print(f"Erro ao criar em {endpoint}: {r.status_code} - {r.text}")
+    return r.json() if r.ok else None
+
+
+if __name__ == "__main__":
+    main()
+    
+    

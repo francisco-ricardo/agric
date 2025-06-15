@@ -1,18 +1,29 @@
 """
-URL configuration for agric project.
+urls.py
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+Configuração das rotas da API do app Agric.
+
+Este módulo define as URLs públicas da aplicação, expondo os endpoints RESTful para:
+- Produtores
+- Estados
+- Cidades
+- Tipos de Cultura
+- Propriedades
+- Culturas
+- Dashboard consolidado
+
+As rotas seguem o padrão REST, utilizando o DefaultRouter do Django REST Framework 
+para os recursos principais, e uma rota customizada para o dashboard.
+
+Rotas principais:
+- /admin/                : Interface administrativa do Django.
+- /api/produtores/       : CRUD de produtores rurais.
+- /api/estados/          : CRUD de estados.
+- /api/cidades/          : CRUD de cidades.
+- /api/tipos-cultura/    : CRUD de tipos de cultura.
+- /api/propriedades/     : CRUD de propriedades rurais.
+- /api/culturas/         : CRUD de culturas agrícolas.
+- /api/dashboard/        : Visão consolidada dos dados (dashboard).
 """
 from django.contrib import admin
 from django.urls import path
@@ -27,8 +38,8 @@ from .views import PropriedadeViewSet
 from .views import CulturaViewSet
 from .views import DashboardView
 
-router = DefaultRouter()
 
+router = DefaultRouter()
 router.register(r'produtores', ProdutorViewSet, basename='produtor')
 router.register(r'estados', EstadoViewSet, basename='estado')
 router.register(r'cidades', CidadeViewSet, basename='cidade')

@@ -12,8 +12,34 @@ if os.environ.get("DJANGO_READ_DOTENV", "1") == "1":
         from dotenv import load_dotenv
         load_dotenv(dotenv_path)
 
-# TODO: REMOVER
-print(f"Django DB Host: {os.environ.get('DJANGO_DB_HOST')}")
+
+# Logging configuration
+LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "INFO")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$y=$%^l%zi08e(1sguhbvqh)rds=6bs&%f(&=m6dzmzj^#3%bd'
@@ -34,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'agric',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
