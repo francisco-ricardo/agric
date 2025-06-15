@@ -25,7 +25,6 @@ Classes:
 - CulturaViewSet: CRUD de culturas agrícolas.
 - DashboardView: Endpoint GET para estatísticas consolidadas.
 """
-
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -45,126 +44,142 @@ from .serializers import CulturaSerializer
 from .models import Propriedade
 from .serializers import PropriedadeSerializer
 
+import logging
+logger = logging.getLogger(__name__)
 
-class ProdutorViewSet(viewsets.ModelViewSet):
+
+class LoggingModelViewSet(viewsets.ModelViewSet):
+    """
+    ModelViewSet base com logging centralizado para operações CRUD.
+    """
+    def list(self, request, *args, **kwargs):
+        logger.info("Listagem de %s acessada por %s", self.__class__.__name__, request.user)
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        logger.info("Tentativa de criação em %s por %s", self.__class__.__name__, request.user)
+        try:
+            response = super().create(request, *args, **kwargs)
+            logger.info("%s criado com sucesso: %s", self.__class__.__name__, response.data)
+            return response
+        except Exception as e:
+            logger.error("Erro ao criar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            raise
+
+    def update(self, request, *args, **kwargs):
+        logger.info("Tentativa de atualização em %s por %s", self.__class__.__name__, request.user)
+        try:
+            response = super().update(request, *args, **kwargs)
+            logger.info("%s atualizado: %s", self.__class__.__name__, response.data)
+            return response
+        except Exception as e:
+            logger.error("Erro ao atualizar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            raise
+
+    def destroy(self, request, *args, **kwargs):
+        logger.info("Tentativa de deleção em %s por %s", self.__class__.__name__, request.user)
+        try:
+            response = super().destroy(request, *args, **kwargs)
+            logger.info("%s deletado: id=%s", self.__class__.__name__, kwargs.get(self.lookup_field))
+            return response
+        except Exception as e:
+            logger.error("Erro ao deletar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            raise
+
+class ProdutorViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Produtor.
-
-    Permite listar, criar, atualizar e deletar produtores rurais.
-    Utiliza o campo 'cpf_cnpj' como identificador principal nas rotas.
     """
     queryset = Produtor.objects.all()
     serializer_class = ProdutorSerializer
     lookup_field = 'cpf_cnpj'
 
-
-class EstadoViewSet(viewsets.ModelViewSet):
+class EstadoViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Estado.
-
-    Permite listar, criar, atualizar e deletar estados.
-    Utiliza o campo 'id_estado' como identificador principal nas rotas.
     """
     queryset = Estado.objects.all()
     serializer_class = EstadoSerializer
     lookup_field = 'id_estado'
 
-
-class CidadeViewSet(viewsets.ModelViewSet):
+class CidadeViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Cidade.
-
-    Permite listar, criar, atualizar e deletar cidades.
-    Utiliza o campo 'id_cidade' como identificador principal nas rotas.
     """
     queryset = Cidade.objects.all()
     serializer_class = CidadeSerializer
     lookup_field = 'id_cidade'
 
-
-class TipoCulturaViewSet(viewsets.ModelViewSet):
+class TipoCulturaViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de TipoCultura.
-
-    Permite listar, criar, atualizar e deletar tipos de cultura agrícola.
-    Utiliza o campo 'id_tipo_cultura' como identificador principal nas rotas.
     """
     queryset = TipoCultura.objects.all()
     serializer_class = TipoCulturaSerializer
     lookup_field = 'id_tipo_cultura'
 
-
-class PropriedadeViewSet(viewsets.ModelViewSet):
+class PropriedadeViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Propriedade.
-
-    Permite listar, criar, atualizar e deletar propriedades rurais.
-    Utiliza o campo 'id_propriedade' como identificador principal nas rotas.
     """
     queryset = Propriedade.objects.all()
     serializer_class = PropriedadeSerializer
     lookup_field = 'id_propriedade'
 
-
-class CulturaViewSet(viewsets.ModelViewSet):
+class CulturaViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Cultura.
-
-    Permite listar, criar, atualizar e deletar culturas agrícolas.
-    Utiliza o campo 'id_cultura' como identificador principal nas rotas.
     """
     queryset = Cultura.objects.all()
     serializer_class = CulturaSerializer
     lookup_field = 'id_cultura'
 
-
 class DashboardView(APIView):
     """
     Endpoint somente leitura para estatísticas consolidadas do sistema.
-
-    Retorna dados agregados sobre fazendas, hectares, culturas plantadas,
-    distribuição por estado e uso do solo.
-    Disponível apenas via método GET.
     """
     def get(self, request):
-        # Total de fazendas cadastradas
-        total_fazendas = Propriedade.objects.count()
-        # Total de hectares registrados (área total)
-        total_hectares = Propriedade.objects.aggregate(total=Sum('area_total'))['total'] or 0
+        logger.info("Dashboard acessado por %s", request.user)
+        try:
+            total_fazendas = Propriedade.objects.count()
+            total_hectares = Propriedade.objects.aggregate(total=Sum('area_total'))['total'] or 0
 
-        # Gráfico de pizza: por estado
-        fazendas_por_estado = (
-            Propriedade.objects
-                .values(nome_estado=F('cidade__estado__nome_estado'))
-                .annotate(
-                    qtd_fazendas=Count('id_propriedade'),
-                    total_hectares=Sum('area_total')
-                )
-                .order_by('-qtd_fazendas')
-        )
+            fazendas_por_estado = (
+                Propriedade.objects
+                    .values(nome_estado=F('cidade__estado__nome_estado'))
+                    .annotate(
+                        qtd_fazendas=Count('id_propriedade'),
+                        total_hectares=Sum('area_total')
+                    )
+                    .order_by('-qtd_fazendas')
+            )
 
-        # Gráfico de pizza: por cultura plantada
-        culturas = (
-            Cultura.objects
-                .values(nome_tipo_cultura=F('tipo_cultura__tipo_cultura'))
-                .annotate(qtd=Count('id_cultura'))
-                .order_by('-qtd')
-        )   
-        culturas_list = []
-        for item in culturas:
-            item['tipo_cultura'] = item.pop('nome_tipo_cultura')
-            culturas_list.append(item)
+            culturas = (
+                Cultura.objects
+                    .values(nome_tipo_cultura=F('tipo_cultura__tipo_cultura'))
+                    .annotate(qtd=Count('id_cultura'))
+                    .order_by('-qtd')
+            )
+            culturas_list = []
+            for item in culturas:
+                item['tipo_cultura'] = item.pop('nome_tipo_cultura')
+                culturas_list.append(item)
 
-        # Gráfico de pizza: uso do solo
-        uso_solo = Propriedade.objects.aggregate(
-            total_agricultavel=Sum('area_agricultavel'),
-            total_vegetacao=Sum('area_vegetacao')
-        )
+            uso_solo = Propriedade.objects.aggregate(
+                total_agricultavel=Sum('area_agricultavel'),
+                total_vegetacao=Sum('area_vegetacao')
+            )
 
-        return Response({
-            "total_fazendas": total_fazendas,
-            "total_hectares": total_hectares,
-            "fazendas_por_estado": list(fazendas_por_estado),
-            "culturas_plantadas": culturas_list,
-            "uso_do_solo": uso_solo,
-        }, status=status.HTTP_200_OK)
+            data = {
+                "total_fazendas": total_fazendas,
+                "total_hectares": total_hectares,
+                "fazendas_por_estado": list(fazendas_por_estado),
+                "culturas_plantadas": culturas_list,
+                "uso_do_solo": uso_solo,
+            }
+            logger.debug("Dados do dashboard: %s", data)
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error("Erro ao calcular estatísticas do dashboard: %s", str(e), exc_info=True)
+            return Response({"detail": "Erro interno ao calcular dashboard."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
