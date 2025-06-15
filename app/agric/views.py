@@ -30,6 +30,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import F, Sum, Count
+import time
 
 from .models import Produtor
 from .serializers import ProdutorSerializer
@@ -50,41 +51,53 @@ logger = logging.getLogger(__name__)
 
 class LoggingModelViewSet(viewsets.ModelViewSet):
     """
-    ModelViewSet base com logging centralizado para operações CRUD.
+    ModelViewSet base com logging de tempo de execução, usuário e tratamento de exceções 
+    para operações CRUD.
     """
     def list(self, request, *args, **kwargs):
-        logger.info("Listagem de %s acessada por %s", self.__class__.__name__, request.user)
-        return super().list(request, *args, **kwargs)
+        user = getattr(request, "user", None)
+        start = time.monotonic()
+        response = super().list(request, *args, **kwargs)
+        elapsed = time.monotonic() - start
+        logger.info("Usuário %s acessou list %s | Tempo: %.3fs", user, self.__class__.__name__, elapsed)
+        return response
 
     def create(self, request, *args, **kwargs):
-        logger.info("Tentativa de criação em %s por %s", self.__class__.__name__, request.user)
+        user = getattr(request, "user", None)
+        start = time.monotonic()
         try:
             response = super().create(request, *args, **kwargs)
-            logger.info("%s criado com sucesso: %s", self.__class__.__name__, response.data)
+            logger.info("Usuário %s criou em %s | Tempo: %.3fs", user, self.__class__.__name__, time.monotonic() - start)
             return response
         except Exception as e:
-            logger.error("Erro ao criar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            elapsed = time.monotonic() - start
+            logger.error("Erro ao criar em %s por %s: %s | Tempo: %.3fs", self.__class__.__name__, user, str(e), elapsed, exc_info=True)
             raise
 
     def update(self, request, *args, **kwargs):
-        logger.info("Tentativa de atualização em %s por %s", self.__class__.__name__, request.user)
+        user = getattr(request, "user", None)
+        start = time.monotonic()
         try:
             response = super().update(request, *args, **kwargs)
-            logger.info("%s atualizado: %s", self.__class__.__name__, response.data)
+            logger.info("Usuário %s atualizou em %s | Tempo: %.3fs", user, self.__class__.__name__, time.monotonic() - start)
             return response
         except Exception as e:
-            logger.error("Erro ao atualizar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            elapsed = time.monotonic() - start
+            logger.error("Erro ao atualizar em %s por %s: %s | Tempo: %.3fs", self.__class__.__name__, user, str(e), elapsed, exc_info=True)
             raise
 
     def destroy(self, request, *args, **kwargs):
-        logger.info("Tentativa de deleção em %s por %s", self.__class__.__name__, request.user)
+        user = getattr(request, "user", None)
+        start = time.monotonic()
         try:
             response = super().destroy(request, *args, **kwargs)
-            logger.info("%s deletado: id=%s", self.__class__.__name__, kwargs.get(self.lookup_field))
+            logger.info("Usuário %s deletou em %s | Tempo: %.3fs", user, self.__class__.__name__, time.monotonic() - start)
             return response
         except Exception as e:
-            logger.error("Erro ao deletar em %s: %s", self.__class__.__name__, str(e), exc_info=True)
+            elapsed = time.monotonic() - start
+            logger.error("Erro ao deletar em %s por %s: %s | Tempo: %.3fs", self.__class__.__name__, user, str(e), elapsed, exc_info=True)
             raise
+
 
 class ProdutorViewSet(LoggingModelViewSet):
     """
@@ -94,6 +107,7 @@ class ProdutorViewSet(LoggingModelViewSet):
     serializer_class = ProdutorSerializer
     lookup_field = 'cpf_cnpj'
 
+
 class EstadoViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Estado.
@@ -101,6 +115,7 @@ class EstadoViewSet(LoggingModelViewSet):
     queryset = Estado.objects.all()
     serializer_class = EstadoSerializer
     lookup_field = 'id_estado'
+
 
 class CidadeViewSet(LoggingModelViewSet):
     """
@@ -110,6 +125,7 @@ class CidadeViewSet(LoggingModelViewSet):
     serializer_class = CidadeSerializer
     lookup_field = 'id_cidade'
 
+
 class TipoCulturaViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de TipoCultura.
@@ -118,6 +134,7 @@ class TipoCulturaViewSet(LoggingModelViewSet):
     serializer_class = TipoCulturaSerializer
     lookup_field = 'id_tipo_cultura'
 
+
 class PropriedadeViewSet(LoggingModelViewSet):
     """
     ViewSet para operações CRUD de Propriedade.
@@ -125,6 +142,7 @@ class PropriedadeViewSet(LoggingModelViewSet):
     queryset = Propriedade.objects.all()
     serializer_class = PropriedadeSerializer
     lookup_field = 'id_propriedade'
+    
 
 class CulturaViewSet(LoggingModelViewSet):
     """
@@ -134,12 +152,14 @@ class CulturaViewSet(LoggingModelViewSet):
     serializer_class = CulturaSerializer
     lookup_field = 'id_cultura'
 
+
 class DashboardView(APIView):
     """
     Endpoint somente leitura para estatísticas consolidadas do sistema.
     """
     def get(self, request):
         logger.info("Dashboard acessado por %s", request.user)
+        start = time.monotonic()
         try:
             total_fazendas = Propriedade.objects.count()
             total_hectares = Propriedade.objects.aggregate(total=Sum('area_total'))['total'] or 0
@@ -181,5 +201,8 @@ class DashboardView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error("Erro ao calcular estatísticas do dashboard: %s", str(e), exc_info=True)
-            return Response({"detail": "Erro interno ao calcular dashboard."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise
+        finally:
+            elapsed = time.monotonic() - start
+            logger.info("Tempo de execução do dashboard: %.3fs", elapsed)
 
