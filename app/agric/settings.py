@@ -61,7 +61,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'agric',
     'django_extensions',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API agric',
+    'DESCRIPTION': 'Documentação OpenAPI da API REST agric.',
+    'VERSION': '1.0.0',
+    'CONTACT': {'name': 'Francisco Ricardo Taborda Aguiar', 
+                'email': 'franciscoricardo.dev@gmail.com'},
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

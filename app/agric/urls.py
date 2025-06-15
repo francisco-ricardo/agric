@@ -38,6 +38,8 @@ from .views import PropriedadeViewSet
 from .views import CulturaViewSet
 from .views import DashboardView
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+
 
 router = DefaultRouter()
 router.register(r'produtores', ProdutorViewSet, basename='produtor')
@@ -52,4 +54,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
+]
+
+
+urlpatterns += [
+    # Gera o schema OpenAPI em formato JSON
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Interface Swagger UI
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # Interface Redoc
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
