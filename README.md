@@ -44,7 +44,7 @@ O Agric API é uma solução robusta para o gerenciamento de produtores rurais, 
 
 ## 🗂️ Modelagem de Dados
 
-![Diagrama DER](docs/der.drawio.png)
+![Diagrama DER](docs/der.png)
 
 ### Principais Tabelas
 
