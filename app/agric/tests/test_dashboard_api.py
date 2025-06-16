@@ -48,3 +48,4 @@ class TestDashboardAPI:
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.json()["total_hectares"] >= 100.0
+

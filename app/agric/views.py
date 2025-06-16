@@ -444,41 +444,33 @@ class DashboardView(APIView):
             total_fazendas = Propriedade.objects.count()
             total_hectares = Propriedade.objects.aggregate(total=Sum('area_total'))['total'] or 0
 
-            fazendas_por_estado = (
-                Propriedade.objects
+            fazendas_por_estado = list(Propriedade.objects
                     .values(nome_estado=F('cidade__estado__nome_estado'))
-                    .annotate(
-                        qtd_fazendas=Count('id_propriedade'),
-                        total_hectares=Sum('area_total')
-                    )
-                    .order_by('-qtd_fazendas')
-            )
+                    .annotate(qtd_fazendas=Count('id_propriedade'),
+                        total_hectares=Sum('area_total'))
+                    .order_by('-qtd_fazendas'))
 
-            culturas = (
-                Cultura.objects
+            culturas = (Cultura.objects
                     .values(nome_tipo_cultura=F('tipo_cultura__tipo_cultura'))
                     .annotate(qtd=Count('id_cultura'))
-                    .order_by('-qtd')
-            )
-            culturas_list = []
-            for item in culturas:
-                item['tipo_cultura'] = item.pop('nome_tipo_cultura')
-                culturas_list.append(item)
+                    .order_by('-qtd'))
+            culturas_list = [{"tipo_cultura": item["nome_tipo_cultura"], 
+                              "qtd": item["qtd"]} for item in culturas]
 
-            uso_solo = Propriedade.objects.aggregate(
-                total_agricultavel=Sum('area_agricultavel'),
-                total_vegetacao=Sum('area_vegetacao')
-            )
+            uso_solo = Propriedade.objects.aggregate(total_agricultavel=Sum('area_agricultavel'),
+                total_vegetacao=Sum('area_vegetacao'))
 
             data = {
                 "total_fazendas": total_fazendas,
                 "total_hectares": total_hectares,
-                "fazendas_por_estado": list(fazendas_por_estado),
+                "fazendas_por_estado": fazendas_por_estado,
                 "culturas_plantadas": culturas_list,
                 "uso_do_solo": uso_solo,
             }
+            serializer = DashboardResponseSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
             logger.debug("Dados do dashboard: %s", data)
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error("Erro ao calcular estatísticas do dashboard: %s", str(e), exc_info=True)
             raise
