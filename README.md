@@ -8,7 +8,8 @@
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-blue)
 
-API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD.
+> API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. 
+Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD, com foco em backend para o desafio técnico *Brain Agriculture – Teste Técnico V2*.
 
 ---
 
