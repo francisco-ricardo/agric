@@ -4,18 +4,21 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Carrega .env apenas em ambiente dev
+
+# Environment and Security
 if os.environ.get("DJANGO_READ_DOTENV", "1") == "1":    
     dotenv_path = os.path.join(BASE_DIR.parent, ".env")
-    print(f"Loading .env file from {dotenv_path}")
     if os.path.exists(dotenv_path):
         from dotenv import load_dotenv
         load_dotenv(dotenv_path)
 
+SECRET_KEY =  os.getenv("SECRET_KEY", 'django-insecure-$y=$%^l%zi08e(1sguhbvqh)rds=6bs&%f(&=m6dzmzj^#3%bd')
+DEBUG = os.getenv("DEBUG", "1") == "1"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+
 
 # Logging configuration
 LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "INFO")
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -41,17 +44,8 @@ LOGGING = {
     },
 }
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$y=$%^l%zi08e(1sguhbvqh)rds=6bs&%f(&=m6dzmzj^#3%bd'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,6 +58,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
 ]
 
+
+# Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }

@@ -198,6 +198,63 @@ Acesse a documentação completa, com exemplos de payloads, descrições e contr
 
 ---
 
+## 🏅 Nível de Maturidade REST
+
+Esta API segue o **Nível 2 do Richardson Maturity Model**:
+
+- Recursos bem definidos e URLs semânticas.
+- Uso correto dos verbos HTTP (GET, POST, PUT/PATCH, DELETE).
+- Retorno de status HTTP apropriados para cada operação.
+- Contratos claros e documentação OpenAPI.
+- (Ainda não implementa HATEOAS, que caracteriza o nível 3.)
+
+---
+
+## 🔒 Segurança
+
+Aqui está uma sugestão revisada para a seção de segurança, destacando tanto o que já está implementado quanto as recomendações para produção:
+
+---
+
+## 🔒 Segurança
+
+O projeto implementa algumas práticas de segurança:
+
+- **Validação rigorosa de dados:** CPF/CNPJ validados, regras de negócio garantidas por serializers e métodos `clean` nos models, validação de áreas das propriedades.
+
+- **Prevenção de injeção de SQL:** Uso exclusivo do ORM do Django.
+
+- **Headers de segurança:** Middlewares padrão do Django (`SecurityMiddleware`, `XFrameOptionsMiddleware`) ativos.
+
+- **Tratamento padronizado de erros:** Respostas HTTP apropriadas, sem exposição de detalhes sensíveis.
+
+- **Logs estruturados:** Todas as operações críticas e erros são registrados para auditoria e monitoramento.
+
+- **Cobertura de testes:** Testes automatizados garantem que regras de negócio e validações de segurança não sejam quebradas.
+
+- **Documentação OpenAPI:** Contrato de API claro, reduzindo riscos de uso incorreto.
+
+> **Nota:** Para facilitar o acesso, testes e avaliação técnica, **esta API está aberta e não exige autenticação JWT ou OAuth2**. Isso foi uma decisão consciente, alinhada aos requisitos do desafio e ao objetivo de permitir testes rápidos e integração fácil.
+Em ambientes de produção, recomenda-se fortemente:
+
+- Implementar autenticação robusta (JWT, OAuth2 ou similar) para proteger todos os endpoints sensíveis.
+
+- Configurar CORS de forma restritiva, permitindo apenas domínios confiáveis.
+
+- Aplicar rate limiting para evitar abusos e ataques de força bruta.
+
+- Utilizar sempre HTTPS em ambientes públicos.
+
+- Definir permissões e regras de acesso adequadas para cada recurso.
+
+- Nunca expor dados sensíveis em respostas ou logs.
+
+- Manter todos os pacotes e dependências atualizados.
+
+- Monitorar e registrar tentativas de acesso não autorizado e erros críticos.
+
+---
+
 ## 📦 Deploy em Nuvem
 
 > **Bônus:** O projeto está pronto para deploy em Railway, AWS, Heroku ou qualquer serviço compatível com Docker e PostgreSQL.
