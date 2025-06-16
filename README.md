@@ -228,9 +228,11 @@ O projeto implementa algumas práticas de segurança:
 
 - **Documentação OpenAPI:** Contrato de API claro, reduzindo riscos de uso incorreto.
 
-> **Nota:** Para facilitar o acesso, testes e avaliação técnica, **esta API está aberta e não exige autenticação JWT ou OAuth2**. Isso foi uma decisão consciente, alinhada aos requisitos do desafio e ao objetivo de permitir testes rápidos e integração fácil.
+**Nota:** Para facilitar o acesso, testes e avaliação técnica, **esta API está aberta e não exige autenticação JWT ou OAuth2**. Isso foi uma decisão consciente, alinhada aos requisitos do desafio e ao objetivo de permitir testes rápidos e integração fácil.
 Em ambientes de produção, recomenda-se fortemente:
+
 - Implementar autenticação robusta (JWT, OAuth2 ou similar) para proteger todos os endpoints sensíveis.
+
 - Configurar CORS de forma restritiva, permitindo apenas domínios confiáveis.
 
 - Aplicar rate limiting para evitar abusos e ataques de força bruta.
