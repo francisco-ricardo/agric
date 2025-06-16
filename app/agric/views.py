@@ -44,10 +44,10 @@ from .models import Cultura
 from .serializers import CulturaSerializer
 from .models import Propriedade
 from .serializers import PropriedadeSerializer
+from .serializers import DashboardResponseSerializer
 
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
-from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import OpenApiExample
 
 import logging
@@ -406,28 +406,32 @@ class CulturaViewSet(LoggingModelViewSet):
     summary="Dashboard consolidado",
     description=(
         "Retorna estatísticas agregadas do sistema, incluindo total de fazendas, hectares, "
-        "culturas plantadas, distribuição de fazendas por estado e uso do solo."
+        "culturas plantadas, distribuição de fazendas por estado e uso do solo. "
+        "Todos os campos são calculados dinamicamente a partir dos dados cadastrados."
     ),
-    responses={
-        200: OpenApiExample(
+    responses={200: DashboardResponseSerializer},
+    examples=[
+        OpenApiExample(
             'Exemplo de resposta',
             value={
-                "total_fazendas": 10,
-                "total_hectares": 1500,
+                "total_fazendas": 3,
+                "total_hectares": 250.5,
                 "fazendas_por_estado": [
-                    {"nome_estado": "SP", "qtd_fazendas": 5, "total_hectares": 800}
+                    {"nome_estado": "Minas Gerais", "qtd_fazendas": 2, "total_hectares": 180.0},
+                    {"nome_estado": "São Paulo", "qtd_fazendas": 1, "total_hectares": 70.5}
                 ],
                 "culturas_plantadas": [
-                    {"tipo_cultura": "Grãos", "qtd": 7}
+                    {"tipo_cultura": "Grãos", "qtd": 2},
+                    {"tipo_cultura": "Frutas", "qtd": 1}
                 ],
                 "uso_do_solo": {
-                    "total_agricultavel": 1200,
-                    "total_vegetacao": 300
+                    "total_agricultavel": 200.0,
+                    "total_vegetacao": 50.5
                 }
             },
             response_only=True
         )
-    }
+    ]
 )
 class DashboardView(APIView):
     """

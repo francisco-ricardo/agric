@@ -130,3 +130,39 @@ class CulturaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cultura
         fields = ['id_cultura', 'ano_safra', 'tipo_cultura', 'propriedade']
+
+
+class FazendaPorEstadoSerializer(serializers.Serializer):
+    """
+    Serializados para representar o agrupamento de fazendas por estado no dashboard.
+    """
+    nome_estado = serializers.CharField(help_text="Nome do estado")
+    qtd_fazendas = serializers.IntegerField(help_text="Quantidade de fazendas no estado")
+    total_hectares = serializers.FloatField(help_text="Soma dos hectares das fazendas no estado")
+
+
+class CulturaPlantadaSerializer(serializers.Serializer):
+    """
+    Serializador para representar o agrupamento de culturas plantadas no dashboard.
+    """
+    tipo_cultura = serializers.CharField(help_text="Nome do tipo de cultura")
+    qtd = serializers.IntegerField(help_text="Quantidade de culturas plantadas desse tipo")
+
+
+class UsoDoSoloSerializer(serializers.Serializer):
+    """
+    Serializador para representar o uso do solo agregado no dashboard.
+    """
+    total_agricultavel = serializers.FloatField(help_text="Área total agricultável (hectares)")
+    total_vegetacao = serializers.FloatField(help_text="Área total de vegetação (hectares)")
+    
+
+class DashboardResponseSerializer(serializers.Serializer):
+    """
+    Serializador para a resposta do endpoint de dashboard consolidado.
+    """
+    total_fazendas = serializers.IntegerField(help_text="Total de fazendas cadastradas")
+    total_hectares = serializers.FloatField(help_text="Soma total de hectares cadastrados")
+    fazendas_por_estado = FazendaPorEstadoSerializer(many=True, help_text="Distribuição de fazendas por estado")
+    culturas_plantadas = CulturaPlantadaSerializer(many=True, help_text="Distribuição de culturas plantadas")
+    uso_do_solo = UsoDoSoloSerializer(help_text="Áreas agregadas de uso do solo")
