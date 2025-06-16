@@ -1,5 +1,10 @@
 # 🌱 Agric API – Gestão de Produtores Rurais
 
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![REST Level 2](https://img.shields.io/badge/REST%20Maturity-Level%202-blue)
+
 API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD.
 
 ---
@@ -126,6 +131,11 @@ Acesse a API em: [http://localhost:8000/api/](http://localhost:8000/api/)
 
 ### Dashboard
 
+Retorna:
+- Total de fazendas cadastradas
+- Total de hectares registrados
+- Gráficos de pizza: por estado, por cultura plantada, por uso do solo
+
 - **GET /api/dashboard/**
 ```json
 {
@@ -162,17 +172,6 @@ Acesse a API em: [http://localhost:8000/api/](http://localhost:8000/api/)
   docker-compose exec app pytest --cov --cov-report=html
   # Abra o arquivo htmlcov/index.html no navegador
   ```
-
----
-
-## 📊 Dashboard
-
-Endpoint: `/api/dashboard/`
-
-Retorna:
-- Total de fazendas cadastradas
-- Total de hectares registrados
-- Gráficos de pizza: por estado, por cultura plantada, por uso do solo
 
 ---
 
@@ -255,9 +254,30 @@ Em ambientes de produção, recomenda-se fortemente:
 
 ---
 
-## 📝 Licença
+## 🤝 Como contribuir
 
-Este projeto está licenciado sob a licença MIT.
+1. Fork este repositório
+2. Crie uma branch: `git checkout -b minha-feature`
+3. Faça suas alterações e commit: `git commit -m 'Minha feature'`
+4. Envie um pull request
+
+---
+
+## ❓ FAQ
+
+**Por que a API não exige autenticação?**  
+Para facilitar testes e avaliação, mas está pronta para receber JWT/OAuth2 em produção.
+
+**Como rodar os testes?**  
+Veja a seção de testes acima ou execute `docker-compose exec app pytest --cov`.
+
+---
+
+## 📚 Referências
+
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [12 Factor App](https://12factor.net/)
+- [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html)
 
 ---
 
@@ -266,5 +286,11 @@ Este projeto está licenciado sob a licença MIT.
 - [Francisco Ricardo Taborda Aguiar](https://github.com/francisco-ricardo)
 - Contato: franciscoricardo.dev@gmail.com
 - [LinkedIn](https://www.linkedin.com/in/francisco-ricardo-taborda-aguiar-3ab650a0/)
+
+---
+
+## 📝 Licença
+
+Este projeto está licenciado sob a licença MIT.
 
 ---
