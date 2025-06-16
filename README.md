@@ -4,6 +4,9 @@
 ![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![REST Level 2](https://img.shields.io/badge/REST%20Maturity-Level%202-blue)
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-blue)
 
 API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD.
 
@@ -59,13 +62,30 @@ O Agric API é uma solução robusta para o gerenciamento de produtores rurais, 
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/agric-api.git
-cd agric-api
+git clone git@github.com:francisco-ricardo/agric.git
+cd agric
 ```
 
 ### 2. Configure variáveis de ambiente
 
-Crie um arquivo .env (exemplo disponível como `.env.example`).
+Crie um arquivo .env no diretório raiz, definindo os seguintes valores:
+
+| Variável              | Valor sugerido (exemplo)           | Descrição                                 |
+|-----------------------|------------------------------------|-------------------------------------------|
+| DJANGO_READ_DOTENV    | 1                                  | Carrega variáveis do .env                 |
+| DEBUG                 | 0                                  | 1 para dev, 0 para produção               |
+| DJANGO_LOG_LEVEL      | INFO                               | Nível de log (INFO, WARNING, ERROR, etc.) |
+| DJANGO_DB_HOST        | agric_api                          | Host do banco usado pelo Django           |
+| DJANGO_DB_NAME        | agric                              | Nome do banco usado pelo Django           |
+| DJANGO_DB_USER        | agric                              | Usuário do banco usado pelo Django        |
+| DJANGO_DB_PASSWORD    | sua_senha_segura                   | Senha do banco usado pelo Django          |
+| POSTGRES_HOST         | agric_db                           | Host do banco PostgreSQL                  |
+| POSTGRES_PORT         | 5432                               | Porta do banco PostgreSQL                 |
+| POSTGRES_DB           | agricdb                            | Nome do banco PostgreSQL                  |
+| POSTGRES_USER         | agric                              | Usuário do banco PostgreSQL               |
+| POSTGRES_PASSWORD     | sua_senha_segura                   | Senha do banco PostgreSQL                 |
+| ALLOWED_HOSTS         | seu.dominio.com,localhost,127.0.0.1| Hosts permitidos (separados por vírgula)  |
+| SECRET_KEY            | sua-chave-secreta                  | Chave secreta do Django                   |
 
 ### 3. Suba a aplicação com Docker
 
@@ -251,15 +271,6 @@ Em ambientes de produção, recomenda-se fortemente:
 ## 📦 Deploy em Nuvem
 
 > **Bônus:** O projeto está pronto para deploy em Railway, AWS, Heroku ou qualquer serviço compatível com Docker e PostgreSQL.
-
----
-
-## 🤝 Como contribuir
-
-1. Fork este repositório
-2. Crie uma branch: `git checkout -b minha-feature`
-3. Faça suas alterações e commit: `git commit -m 'Minha feature'`
-4. Envie um pull request
 
 ---
 
