@@ -212,12 +212,6 @@ Esta API segue o **Nível 2 do Richardson Maturity Model**:
 
 ## 🔒 Segurança
 
-Aqui está uma sugestão revisada para a seção de segurança, destacando tanto o que já está implementado quanto as recomendações para produção:
-
----
-
-## 🔒 Segurança
-
 O projeto implementa algumas práticas de segurança:
 
 - **Validação rigorosa de dados:** CPF/CNPJ validados, regras de negócio garantidas por serializers e métodos `clean` nos models, validação de áreas das propriedades.
@@ -236,9 +230,7 @@ O projeto implementa algumas práticas de segurança:
 
 > **Nota:** Para facilitar o acesso, testes e avaliação técnica, **esta API está aberta e não exige autenticação JWT ou OAuth2**. Isso foi uma decisão consciente, alinhada aos requisitos do desafio e ao objetivo de permitir testes rápidos e integração fácil.
 Em ambientes de produção, recomenda-se fortemente:
-
 - Implementar autenticação robusta (JWT, OAuth2 ou similar) para proteger todos os endpoints sensíveis.
-
 - Configurar CORS de forma restritiva, permitindo apenas domínios confiáveis.
 
 - Aplicar rate limiting para evitar abusos e ataques de força bruta.
