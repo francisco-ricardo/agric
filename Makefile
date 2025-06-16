@@ -1,65 +1,39 @@
-
+# Makefile – Atalhos para desenvolvimento e manutenção do projeto Agric
+#
+# Comandos principais:
+#   make build      – Builda a imagem Docker de desenvolvimento
+#   make up         – Sobe todos os containers (API e banco) em background
+#   make updb       – Sobe apenas o container do banco de dados
+#   make down       – Remove containers da API e do banco
+#   make createdb   – Cria o banco de dados 'agricdb' dentro do container do Postgres
+#   make help       – Mostra esta ajuda
 
 .PHONY: build updb createdb help
 
-
+# Target: build – Builda a imagem Docker de desenvolvimento
 build:
 	docker build -t agric_devcontainer:latest -f .devcontainer/Dockerfile .
 
+# Target: up – Sobe todos os containers (API e banco) em background
+up:
+	docker-compose -f docker-compose.yml up --build -d
+
+# Target: updb – Sobe apenas o container do banco de dados
 updb:
 	docker-compose up -d agric_db
 
+# Target: down – Remove containers da API e do banco
+# Obs: ignora erro se o container não existir
+down:
+	docker rm -f agric_api.dev || true	
+	docker rm -f agric_db.dev || true
+
+# Target: createdb – Cria o banco de dados 'agricdb' dentro do container do Postgres
 createdb:
 	docker exec -it agric_db.dev createdb -U agric agricdb
 
+# Target: help – Mostra esta ajuda
 help:
 	@egrep "^# Target:" [Mm]akefile
-
-
-
-# Target: up - Starts the FactoryDash development environment using Docker Compose.
-# Builds images if necessary and runs containers in detached mode.
-#
-# Usage: make up
-up:
-	docker-compose -f docker-compose-dev.yaml up --build -d
-
-
-# Target: down - Stops and removes all containers associated with the FactoryDash development environment. 
-# This includes the main application, Celery worker, Celery beat, Redis, and Postgres containers.
-# The `|| true` ensures that the command doesn't fail if a container doesn't exist.
-#
-# Usage: make down
-down:
-	docker rm -f factorydash.dev || true
-	docker rm -f factorydash.celery_worker.dev || true
-	docker rm -f factorydash.celery_beat.dev || true
-	docker rm -f factorydash.redis.dev || true
-	docker rm -f factorydash.postgres.dev || true
-
-
-# Target: run - Executes the 'supervisord' process within the 'factorydash.dev' container. 
-# This is typically used to start and manage the application's processes within the container.
-# It uses the supervisord configuration file located at 
-# '/factorydash/.devcontainer/supervisord.dev.conf'.
-#
-# Usage: make run
-run:
-	docker exec factorydash.dev supervisord -c /factorydash/.devcontainer/supervisord.dev.conf
-
-
-# Target: stop - Stops the 'supervisord' process within the 'factorydash.dev' container. 
-# This effectively stops all processes managed by supervisord within the container.
-#
-# Usage: make stop
-stop:
-	docker exec factorydash.dev pkill supervisord
-
-
-
-
-
-
-
 
 # EOF

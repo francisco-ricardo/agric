@@ -87,15 +87,40 @@ Crie um arquivo .env no diretório raiz, definindo os seguintes valores:
 | ALLOWED_HOSTS         | seu.dominio.com,localhost,127.0.0.1| Hosts permitidos (separados por vírgula)  |
 | SECRET_KEY            | sua-chave-secreta                  | Chave secreta do Django                   |
 
-### 3. Suba a aplicação com Docker
+### 3. Suba os containers (API e Banco de Dados)
 
 ```bash
 docker-compose up --build
 ```
 
+### 4. Crie o banco de dados `agricdb`
+
+```bash
+docker exec -it agric_db.dev createdb -U agric agricdb
+```
+
+### 5. Faça as migrações
+
+```bash
+docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py makemigrations agric"
+docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py migrate"
+```
+
+### 6. Preencha o banco de dados
+
+```bash
+docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py seed"
+```
+
+### 7. Suba a aplicação
+
+```bash
+docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py runserver 0.0.0.0:8000"
+```
+
 Acesse a API em: [http://localhost:8000/api/](http://localhost:8000/api/)
 
-### 4. Acesse a documentação interativa
+### 8. Acesse a documentação interativa
 
 - **Swagger UI:** [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 - **Redoc:** [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
@@ -265,6 +290,22 @@ Em ambientes de produção, recomenda-se fortemente:
 - Manter todos os pacotes e dependências atualizados.
 
 - Monitorar e registrar tentativas de acesso não autorizado e erros críticos.
+
+---
+
+## ⚡ Performance e Escalabilidade
+
+- O projeto utiliza Django e PostgreSQL, tecnologias robustas e amplamente utilizadas em aplicações de missão crítica.
+- Para ambientes de produção, recomenda-se:
+  - Utilizar servidores WSGI/ASGI performáticos (ex: Gunicorn, Uvicorn) atrás de um proxy reverso (ex: Nginx).
+  - Configurar connection pool do banco de dados para suportar múltiplas conexões simultâneas.
+  - Ativar cache (Redis/Memcached) para respostas e consultas frequentes.
+  - Habilitar compressão de respostas HTTP e uso de CDN para arquivos estáticos.
+  - Monitorar métricas de uso, latência e erros com ferramentas como Prometheus, Grafana, Sentry ou APM.
+  - Escalar horizontalmente via containers/Docker Swarm/Kubernetes conforme a demanda.
+  - Implementar rate limiting para evitar abusos e proteger recursos.
+- O código e as queries SQL são otimizados para operações em lote e uso eficiente do ORM.
+- Testes de carga e stress são recomendados antes de grandes deploys.
 
 ---
 
