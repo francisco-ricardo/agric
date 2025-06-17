@@ -103,17 +103,29 @@ WSGI_APPLICATION = 'agric.wsgi.application'
 
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'agricdb'),
-        'USER': os.environ.get('POSTGRES_USER', 'agric'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'agric'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'agric_db'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-    }
-}
+if (os.environ.get('POSTGRES_DB')
+    and os.environ.get('POSTGRES_USER')
+    and os.environ.get('POSTGRES_PASSWORD')
+    and os.environ.get('POSTGRES_HOST')):
 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB'),
+            'USER': os.environ.get('POSTGRES_USER'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': os.environ.get('POSTGRES_HOST'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
+    }
+else:
+    # Fallback para SQLite (ex: CI/CD, dev local sem .env)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 
