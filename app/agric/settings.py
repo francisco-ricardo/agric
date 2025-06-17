@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'agric',
     'django_extensions',
     'drf_spectacular',
+    'corsheaders',
 ]
 
 
@@ -73,6 +74,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,6 +85,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'agric.urls'
+CORS_ALLOW_ALL_ORIGINS = True  # Para testes/demonstracao publica
 
 TEMPLATES = [
     {
