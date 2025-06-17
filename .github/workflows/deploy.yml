@@ -64,7 +64,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/agric
-            docker compose -f docker-compose-prod.yml up -d --pull always
+            docker-compose -f docker-compose-prod.yml down || true
+            docker-compose -f docker-compose-prod.yml up -d --pull always
 
       - name: Run migrations and seed
         uses: appleboy/ssh-action@v1.0.3
@@ -74,6 +75,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/agric
-            docker compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py migrate
-            docker compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py seed
+            for i in {1..12}; do
+              docker-compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py showmigrations && break
+              echo "Aguardando container subir..."
+              sleep 5
+            done
+            docker-compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py migrate
+            docker-compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py seed
 
