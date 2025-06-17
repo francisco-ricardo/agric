@@ -64,4 +64,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/agric
-            docker-compose up --build -d
+            docker-compose -f docker-compose-prod.yml up --build -d
+
