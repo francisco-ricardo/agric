@@ -23,10 +23,12 @@ jobs:
 
       - name: Run migrations
         run: |
-          python app/manage.py migrate
+          cd app
+          python manage.py migrate
 
       - name: Run tests (SQLite)
         run: |
+          cd app
           pytest --cov
 
   deploy:
