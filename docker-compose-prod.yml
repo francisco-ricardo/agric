@@ -1,6 +1,8 @@
 services:  
 
-  agric_api:    
+  agric_api:
+    container_name: agric_api.prod
+    image: agric_api.prod:latest
     build:
       context: .
       dockerfile: Dockerfile
