@@ -63,6 +63,9 @@ INSTALLED_APPS = [
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -119,6 +122,9 @@ if (os.environ.get('POSTGRES_DB')
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
             'HOST': os.environ.get('POSTGRES_HOST'),
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
         }
     }
 else:
