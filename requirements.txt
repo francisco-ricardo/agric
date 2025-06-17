@@ -10,3 +10,4 @@ Faker==37.4.0
 requests==2.32.4
 pytest-cov==6.2.1
 drf-spectacular==0.28.0
+gunicorn==23.0.0
