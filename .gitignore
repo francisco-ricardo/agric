@@ -78,6 +78,7 @@ celerybeat-schedule-wal
 .env.*
 .secrets
 .rds.secrets
+.ec2.secrets
 
 
 .$*
