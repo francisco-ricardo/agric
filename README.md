@@ -11,8 +11,9 @@
 ![Makefile](https://img.shields.io/badge/Makefile-automation-blue)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-blue)
 ![REST Level 2](https://img.shields.io/badge/REST%20Maturity-Level%202-blue)
-![AWS Deploy](https://img.shields.io/badge/aws-deploy%20ready-orange?logo=amazon-aws)
+![AWS Deploy](https://img.shields.io/badge/aws-em%20teste-blue?logo=amazon-aws)
 
+> :rocket: Projeto em teste na AWS! [Acesse aqui](http://44.207.252.93:8000/api/docs)
 
 > API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. 
 Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD, com foco em backend para o desafio técnico *Brain Agriculture – Teste Técnico V2*.
