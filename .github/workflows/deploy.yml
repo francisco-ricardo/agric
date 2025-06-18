@@ -64,8 +64,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/agric
-            docker-compose -f docker-compose-prod.yml down || true
-            docker-compose -f docker-compose-prod.yml up -d --pull always
+            docker rm -f agric_api.prod || true
+            docker-compose -f docker-compose-prod.yml up --build -d
 
       - name: Run migrations and seed
         uses: appleboy/ssh-action@v1.0.3
@@ -75,6 +75,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/agric
-            docker-compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py migrate
-            docker-compose -f docker-compose-prod.yml exec -T agric_api.prod python manage.py seed
+            docker exec -it agric_api.prod sh -c "cd /app && python manage.py migrate"
+            docker exec -it agric_api.prod sh -c "cd /app && python manage.py seed"
 
