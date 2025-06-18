@@ -9,9 +9,10 @@
 #   make migrate    – Aplica as migrações do Django
 #   make seed       – Popula o banco de dados com dados iniciais
 #   make run        – Inicia o servidor de desenvolvimento do Django
+#   make cov        – Executa os testes do Django e gera o relatório de cobertura
 #   make help       – Mostra esta ajuda
 
-.PHONY: build up updb down createdb migrate seed run help
+.PHONY: build up updb down createdb migrate seed run cov help
 
 # Target: build – Builda a imagem Docker de desenvolvimento
 build:
@@ -47,6 +48,10 @@ seed:
 # Target: run – Inicia o servidor de desenvolvimento do Django
 run:
 	docker exec -it agric_api.dev sh -c "cd /code/app && python manage.py runserver 0.0.0.0:8000"
+
+# Target: test – Executa os testes do Django e gera o relatório de cobertura
+cov:
+	docker exec -it agric_api.dev sh -c "cd /code/app && pytest --cov --cov-report=html"
 
 # Target: help – Mostra esta ajuda
 help:

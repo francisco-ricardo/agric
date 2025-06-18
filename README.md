@@ -35,7 +35,6 @@ O Agric API é uma solução robusta para o gerenciamento de produtores rurais, 
 - API RESTful documentada (Swagger/OpenAPI).
 - Testes unitários e de integração (TDD).
 - Observabilidade via logs estruturados.
-- Pronto para deploy em nuvem (Railway, AWS, etc).
 
 ---
 
@@ -53,15 +52,6 @@ O Agric API é uma solução robusta para o gerenciamento de produtores rurais, 
 ## 🗂️ Modelagem de Dados
 
 ![Diagrama DER](docs/der.png)
-
-### Principais Tabelas
-
-- **produtor:** CPF/CNPJ, tipo_documento, nome_produtor
-- **estado:** id_estado, nome_estado
-- **cidade:** id_cidade, nome_cidade, id_estado
-- **propriedade:** id_propriedade, nome_propriedade, área total, área agricultável, área vegetação, id_cidade, cpf_cnpj
-- **tipo_cultura:** id_tipo_cultura, tipo_cultura
-- **cultura:** id_cultura, ano_safra, id_tipo_cultura, id_propriedade
 
 ---
 
@@ -99,7 +89,7 @@ Use o Makefile para facilitar:
 ```bash
 make up
 ```
-Isso irá buildar as imagens e subir os containers da API e do banco de dados em background.
+Isso irá construir as imagens e subir os containers da API e do banco de dados em background.
 
 ### 4. Crie o banco de dados (se necessário)
 
@@ -232,7 +222,7 @@ Retorna:
   - Testes de integração ponta a ponta dos principais endpoints
 - Para visualizar o relatório de cobertura em HTML:
   ```bash
-  docker-compose exec app pytest --cov --cov-report=html
+  make cov
   # Abra o arquivo htmlcov/index.html no navegador
   ```
 
