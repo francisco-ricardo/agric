@@ -117,16 +117,17 @@ if (os.environ.get('POSTGRES_DB')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DB'),
-            'USER': os.environ.get('POSTGRES_USER'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-            'HOST': os.environ.get('POSTGRES_HOST'),
+            'NAME': os.environ.get('POSTGRES_DB', 'agricdb'),
+            'USER': os.environ.get('POSTGRES_USER', 'agric'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'agric'),
+            'HOST': os.environ.get('POSTGRES_HOST', 'agric_db'),
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
+            'OPTIONS': {'sslmode': 'require'},
         }
     }
+
+    if os.environ.get('DJANGO_DB_DISABLE_SSL') == '1':
+        DATABASES['default']['OPTIONS'] = {'sslmode': 'disable'}
 else:
     # Fallback para SQLite (ex: CI/CD, dev local sem .env)
     DATABASES = {

@@ -3,10 +3,16 @@
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![REST Level 2](https://img.shields.io/badge/REST%20Maturity-Level%202-blue)
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
-![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Django](https://img.shields.io/badge/Django-5.2-green?logo=django)
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
+![Docker Compose](https://img.shields.io/badge/docker--compose-ready-blue?logo=docker)
+![Dev Container](https://img.shields.io/badge/devcontainer-ready-brightgreen?logo=visualstudiocode)
+![Makefile](https://img.shields.io/badge/Makefile-automation-blue)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-blue)
+![REST Level 2](https://img.shields.io/badge/REST%20Maturity-Level%202-blue)
+![AWS Deploy](https://img.shields.io/badge/aws-deploy%20ready-orange?logo=amazon-aws)
+
 
 > API RESTful para cadastro, gestão e análise de produtores rurais, propriedades, culturas e safras. 
 Desenvolvida com Django, Docker e PostgreSQL, seguindo as melhores práticas de Clean Code, SOLID, KISS e TDD, com foco em backend para o desafio técnico *Brain Agriculture – Teste Técnico V2*.
@@ -67,19 +73,15 @@ git clone git@github.com:francisco-ricardo/agric.git
 cd agric
 ```
 
-### 2. Configure variáveis de ambiente
+### 2. Configure as variáveis de ambiente
 
 Crie um arquivo .env no diretório raiz, definindo os seguintes valores:
 
 | Variável              | Valor sugerido (exemplo)           | Descrição                                 |
 |-----------------------|------------------------------------|-------------------------------------------|
 | DJANGO_READ_DOTENV    | 1                                  | Carrega variáveis do .env                 |
-| DEBUG                 | 0                                  | 1 para dev, 0 para produção               |
+| DEBUG                 | 1                                  | 1 para dev, 0 para produção               |
 | DJANGO_LOG_LEVEL      | INFO                               | Nível de log (INFO, WARNING, ERROR, etc.) |
-| DJANGO_DB_HOST        | agric_api                          | Host do banco usado pelo Django           |
-| DJANGO_DB_NAME        | agric                              | Nome do banco usado pelo Django           |
-| DJANGO_DB_USER        | agric                              | Usuário do banco usado pelo Django        |
-| DJANGO_DB_PASSWORD    | sua_senha_segura                   | Senha do banco usado pelo Django          |
 | POSTGRES_HOST         | agric_db                           | Host do banco PostgreSQL                  |
 | POSTGRES_PORT         | 5432                               | Porta do banco PostgreSQL                 |
 | POSTGRES_DB           | agricdb                            | Nome do banco PostgreSQL                  |
@@ -87,44 +89,58 @@ Crie um arquivo .env no diretório raiz, definindo os seguintes valores:
 | POSTGRES_PASSWORD     | sua_senha_segura                   | Senha do banco PostgreSQL                 |
 | ALLOWED_HOSTS         | seu.dominio.com,localhost,127.0.0.1| Hosts permitidos (separados por vírgula)  |
 | SECRET_KEY            | sua-chave-secreta                  | Chave secreta do Django                   |
+| DJANGO_DB_DISABLE_SSL | 1                                  | Desabilita SSL na conexão com o BD local  |
 
-### 3. Suba os containers (API e Banco de Dados)
+### 3. Suba o ambiente de desenvolvimento
 
-```bash
-docker-compose up --build
-```
-
-### 4. Crie o banco de dados `agricdb`
+Use o Makefile para facilitar:
 
 ```bash
-docker exec -it agric_db.dev createdb -U agric agricdb
+make up
 ```
+Isso irá buildar as imagens e subir os containers da API e do banco de dados em background.
 
-### 5. Faça as migrações
+### 4. Crie o banco de dados (se necessário)
 
 ```bash
-docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py makemigrations agric"
-docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py migrate"
+make createdb
 ```
 
-### 6. Preencha o banco de dados
+### 5. Aplique as migrações
 
 ```bash
-docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py seed"
+make migrate
 ```
 
-### 7. Suba a aplicação
+### 6. (Opcional) Popule o banco com dados iniciais
 
 ```bash
-docker exec -it agric_api.dev sh -c "cd /workspaces/agric/app && python manage.py runserver 0.0.0.0:8000"
+make seed
 ```
 
-Acesse a API em: [http://localhost:8000/api/](http://localhost:8000/api/)
+### 7. Acesse a aplicação
 
-### 8. Acesse a documentação interativa
+O servidor estará disponível em [http://localhost:8000](http://localhost:8000).
 
-- **Swagger UI:** [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
-- **Redoc:** [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
+Exemplos:
+
+- http://localhost:8000/api/dashboard/
+- http://localhost:8000/api/produtores/
+- http://localhost:8000/api/docs/
+- http://localhost:8000/api/redoc/
+
+
+### 8. Para parar o ambiente
+
+```bash
+make down
+```
+
+### 9. Para ver todos os comandos disponíveis
+
+```bash
+make help
+```
 
 ---
 
@@ -352,7 +368,7 @@ Você pode interagir com a API em tempo real. Exemplos:
 > Para facilitar a avaliação e o acesso público, o CORS está aberto para qualquer origem.
 > O deploy AWS não utiliza proxy reverso e não está configurado com HTTPS.
 > **Em ambientes de produção**, recomenda-se fortemente:
-> - Utilizar proxy reverso (Nginx/Traefik) para servir a aplicação e arquivos estáticos.
+> - Utilizar proxy reverso (Nginx/Traefik).
 > - Habilitar HTTPS com certificados válidos.
 > - Restringir o CORS apenas para domínios confiáveis.
 > - Adotar práticas adicionais de segurança e performance.

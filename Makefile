@@ -6,13 +6,16 @@
 #   make updb       – Sobe apenas o container do banco de dados
 #   make down       – Remove containers da API e do banco
 #   make createdb   – Cria o banco de dados 'agricdb' dentro do container do Postgres
+#   make migrate    – Aplica as migrações do Django
+#   make seed       – Popula o banco de dados com dados iniciais
+#   make run        – Inicia o servidor de desenvolvimento do Django
 #   make help       – Mostra esta ajuda
 
-.PHONY: build updb createdb help
+.PHONY: build up updb down createdb migrate seed run help
 
 # Target: build – Builda a imagem Docker de desenvolvimento
 build:
-	docker build -t agric_devcontainer:latest -f .devcontainer/Dockerfile .
+	docker build -t agric_api.dev:latest -f .devcontainer/Dockerfile .
 
 # Target: up – Sobe todos os containers (API e banco) em background
 up:
@@ -31,6 +34,19 @@ down:
 # Target: createdb – Cria o banco de dados 'agricdb' dentro do container do Postgres
 createdb:
 	docker exec -it agric_db.dev createdb -U agric agricdb
+
+# Target: migrate – Aplica as migrações do Django
+migrate:
+	docker exec -it agric_api.dev sh -c "cd /code/app && python manage.py makemigrations agric"
+	docker exec -it agric_api.dev sh -c "cd /code/app && python manage.py migrate"
+
+# Target: seed – Popula o banco de dados com dados iniciais
+seed:
+	docker exec -it agric_api.dev sh -c "cd /code/app && python manage.py seed"
+
+# Target: run – Inicia o servidor de desenvolvimento do Django
+run:
+	docker exec -it agric_api.dev sh -c "cd /code/app && python manage.py runserver 0.0.0.0:8000"
 
 # Target: help – Mostra esta ajuda
 help:

@@ -7,6 +7,7 @@ services:
     environment:
       - POSTGRES_USER=agric
       - POSTGRES_PASSWORD=agric
+      - POSTGRES_DB=agricdb
     ports:
       - "5432:5432"
     volumes:
