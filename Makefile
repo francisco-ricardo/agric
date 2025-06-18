@@ -16,7 +16,7 @@ build:
 
 # Target: up – Sobe todos os containers (API e banco) em background
 up:
-	docker-compose -f docker-compose.yml up --build -d
+	docker-compose -f docker-compose-dev.yml up --build -d
 
 # Target: updb – Sobe apenas o container do banco de dados
 updb:

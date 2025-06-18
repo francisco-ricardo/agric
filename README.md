@@ -305,14 +305,57 @@ Em ambientes de produção, recomenda-se fortemente:
   - Monitorar métricas de uso, latência e erros com ferramentas como Prometheus, Grafana, Sentry ou APM.
   - Escalar horizontalmente via containers/Docker Swarm/Kubernetes conforme a demanda.
   - Implementar rate limiting para evitar abusos e proteger recursos.
+  - Paginação de queries: Para endpoints que podem retornar muitos registros, recomenda-se sempre implementar paginação (limit/offset ou cursor-based). Isso garante respostas rápidas, uso eficiente de recursos e melhor experiência para o consumidor da API. O Django REST Framework já oferece suporte nativo a paginação configurável.
 - O código e as queries SQL são otimizados para operações em lote e uso eficiente do ORM.
 - Testes de carga e stress são recomendados antes de grandes deploys.
 
 ---
 
-## 📦 Deploy em Nuvem
+## 🌐 Deploy AWS & CI/CD Pipeline (Diferencial)
 
-> **Bônus:** O projeto está pronto para deploy em Railway, AWS, Heroku ou qualquer serviço compatível com Docker e PostgreSQL.
+Este projeto está **implantado automaticamente na AWS EC2** via pipeline CI/CD (GitHub Actions), utilizando Docker e banco PostgreSQL gerenciado na AWS RDS. Todo o processo segue padrões profissionais de DevOps e infraestrutura como código.
+
+### 🔗 API Online para Testes
+
+Você pode interagir com a API em tempo real. Exemplos:
+
+- [Dashboard consolidado](http://44.207.252.93:8000/api/dashboard/)
+- [Produtores](http://44.207.252.93:8000/api/produtores/)
+- [Documentação OpenAPI (Swagger)](http://44.207.252.93:8000/api/docs/)
+
+### 🚀 Pipeline de Deploy (GitHub Actions)
+
+- **Testes automatizados:** Cada push no `main` executa testes unitários e de integração.
+- **Deploy seguro:** O código é enviado via SSH para a EC2, onde o pipeline:
+  - Atualiza o código-fonte.
+  - Gera o arquivo `.env` de produção a partir de secrets do GitHub (com proteção para caracteres especiais).
+  - Sobe os containers Docker em modo produção (`gunicorn`).
+  - Executa migrações e seed do banco via containers efêmeros, garantindo consistência e idempotência.
+  - Exibe logs de erro automaticamente em caso de falha.
+- **Containers temporários são removidos automaticamente** após comandos administrativos, mantendo o ambiente limpo.
+
+### ☁️ Infraestrutura AWS
+
+- **EC2:** Instância Linux com Docker, configurada com Elastic IP para endpoint público estável.
+- **RDS PostgreSQL:** Banco de dados gerenciado, seguro e escalável.
+- **Segurança:** Grupos de segurança configurados para acesso restrito entre EC2 e RDS.
+- **Variáveis sensíveis:** Gerenciadas via GitHub Secrets, nunca expostas no repositório.
+- **Gunicorn:** Servidor WSGI robusto, otimizado para produção.
+
+### 🏆 Destaques do pipeline e infraestrutura
+
+- **Zero downtime:** Deploys não derrubam a API.
+- **Logs e troubleshooting facilitados:** Logs acessíveis via pipeline e SSH.
+- **Pronto para avaliação técnica:** O código, a infraestrutura e o pipeline seguem padrões de mercado, facilitando auditoria e evolução.
+
+> **Nota sobre ambiente de testes:**
+> Para facilitar a avaliação e o acesso público, o CORS está aberto para qualquer origem.
+> O deploy AWS não utiliza proxy reverso e não está configurado com HTTPS.
+> **Em ambientes de produção**, recomenda-se fortemente:
+> - Utilizar proxy reverso (Nginx/Traefik) para servir a aplicação e arquivos estáticos.
+> - Habilitar HTTPS com certificados válidos.
+> - Restringir o CORS apenas para domínios confiáveis.
+> - Adotar práticas adicionais de segurança e performance.
 
 ---
 
