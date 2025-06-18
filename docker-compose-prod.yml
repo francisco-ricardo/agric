@@ -10,3 +10,15 @@ services:
       - "8000:8000"
     env_file:
       - .env
+
+  migrate:
+    image: agric_api.prod
+    env_file:
+      - .env
+    command: python manage.py migrate
+
+  seed:
+    image: agric_api.prod
+    env_file:
+      - .env
+    command: python manage.py seed
