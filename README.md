@@ -308,13 +308,12 @@ Em ambientes de produção, recomenda-se fortemente:
   - Utilizar servidores WSGI/ASGI performáticos (ex: Gunicorn, Uvicorn) atrás de um proxy reverso (ex: Nginx).
   - Configurar connection pool do banco de dados para suportar múltiplas conexões simultâneas.
   - Ativar cache (Redis/Memcached) para respostas e consultas frequentes.
-  - Habilitar compressão de respostas HTTP e uso de CDN para arquivos estáticos.
+  - Habilitar compressão de respostas HTTP para otimizar o tráfego de dados da API.
   - Monitorar métricas de uso, latência e erros com ferramentas como Prometheus, Grafana, Sentry ou APM.
   - Escalar horizontalmente via containers/Docker Swarm/Kubernetes conforme a demanda.
   - Implementar rate limiting para evitar abusos e proteger recursos.
-  - Paginação de queries: Para endpoints que podem retornar muitos registros, recomenda-se sempre implementar paginação (limit/offset ou cursor-based). Isso garante respostas rápidas, uso eficiente de recursos e melhor experiência para o consumidor da API. O Django REST Framework já oferece suporte nativo a paginação configurável.
-- O código e as queries SQL são otimizados para operações em lote e uso eficiente do ORM.
-- Testes de carga e stress são recomendados antes de grandes deploys.
+  - Paginação de queries: Para endpoints que podem retornar muitos registros, implementar paginação (limit/offset ou cursor-based). Isso garante respostas rápidas, uso eficiente de recursos e melhor experiência para o consumidor da API. O Django REST Framework já oferece suporte nativo a paginação configurável.
+  - Testes de carga e stress.
 
 ---
 
