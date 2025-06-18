@@ -54,7 +54,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "${{ secrets.ENV_PROD }}" > ~/agric/.env
+            echo '${{ secrets.ENV_PROD }}' > ~/agric/.env
 
       - name: Run docker-compose up
         uses: appleboy/ssh-action@v1.0.3
